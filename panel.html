@@ -1,0 +1,1411 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel - Laboratorio de Informatica</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #d1dfec;
+      color: #1e293b;
+    }
+
+    .top-bar {
+      background: #365885;
+      color: white;
+      padding: 1em 1.5em;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .top-bar-left {
+      display: flex;
+      align-items: center;
+    }
+    /* Le damos margen derecho únicamente al logo para empujar el texto */
+    .top-bar-left .logo {
+      margin-right: 1em;
+
+    }
+
+    .logo {
+      background: #187b8b;
+      color: #1a56db;
+      height: 3.25em;
+      width: 3.25em;
+      border-radius: 0.625em;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 1.25em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .logo img {
+      width: 100%;       /* Obliga a la imagen a ocupar el ancho del recuadro */
+      height: 100%;      /* Obliga a la imagen a ocupar el alto del recuadro */
+      object-fit: contain; /* Ajusta la imagen de INFO de forma proporcional sin deformarla ni estirarla */
+      padding: 0.2em;    /* Un pequeño margen interno para que el logo no toque el borde del cuadro blanco */
+    }
+
+    .title {
+      font-size: 1.625em;
+      font-weight: 700;
+    }
+
+    .subtitle {
+      font-size: 0.9375em;
+      opacity: 0.9;
+    }
+
+    .clock {
+      text-align: right;
+    }
+
+    .clock-time {
+      font-size: 2.375em;
+      font-weight: 700;
+      font-family: monospace;
+    }
+
+    .clock-date {
+      font-size: 0.9375em;
+      opacity: 0.9;
+    }
+
+    /*---------------------------------------------------------------*/
+    .status-bar {
+      background: white;
+      border: 2px solid #e2e8f0;
+      border-radius: 0.625em;
+      padding: 0.4em 1.5em;
+      margin: 0.5em 1.5em;
+      display: flex;
+      align-items: center;
+      flex-wrap: nowrap;
+      box-shadow: 0 1px 0.25em rgba(0, 0, 0, 0.06);
+    }
+
+    .status-bar > * {
+      margin-right: 1.125em;
+    }
+
+    .status-bar > *:last-child {
+      margin-right: 0;
+    }
+
+    .day-badge {
+      background: #608ec9;
+      color: white;
+      padding: 0.3em 1.25em;
+      border-radius: 0.5em;
+      font-size: 1.2em;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .divider {
+      width: 0.125em; 
+      height: 2.5em;
+      background: #e2e8f0;
+    }
+
+    .status-dot {
+      width: 0.875em;
+      height: 0.875em;
+      border-radius: 50%;
+      background: #22c55e;
+      box-shadow: 0 0 0 0.1875em #dcfce7;
+    }
+
+    .status-dot.break {
+      background: #f59e0b;
+      box-shadow: 0 0 0 0.1875em #fef3c7;
+    }
+
+    .status-dot.inactive {
+      background: #94a3b8;
+      box-shadow: none;
+    }
+
+    .status-label {
+      font-size: 1.25em;
+      font-weight: 700;
+      font-family: monospace;
+    }
+
+    .status-time {
+      font-size: 0.875em;
+      color: #64748b;
+      font-family: monospace;
+    }
+
+    .status-info {
+      font-size: 1em;
+      color: #475569;
+    }
+
+    .status-info strong {
+      color: #1e293b;
+    }
+
+    /*---------------------------------------------------------------*/
+    .filters {
+      display: flex;
+      align-items: center;
+      flex-wrap: nowrap;
+      margin-left: auto;
+    }
+    .filters > * {
+      margin-right: 1em;
+    }
+    .filters > *:last-child {
+      margin-right: 0;
+    }
+
+    .filter-group {
+      display: flex;
+      align-items: center;
+    }
+    /* Separa la palabra "Día:" o "Vista:" de su respectivo <select> */
+    .filter-group .filter-label {
+      margin-right: 0.5em;
+    }
+
+    .filter-group {
+      display: flex;
+      align-items: center;
+    }
+
+    .filter-label {
+      font-size: 0.9375em;
+      font-weight: 600;
+      color: #475569;
+    }
+
+    .filter-select {
+      padding: 0.3em 0.875em;
+      border: 2px solid #e2e8f0;
+      border-radius: 0.5em;
+      font-size: 0.9375em;
+      font-weight: 600;
+      background: #608ec9;
+      color: #edf2f8;
+      cursor: pointer;
+      min-width: 10em;
+    }
+
+    .filter-select:focus {
+      outline: none;
+      border-color: #608ec9;
+    }
+
+    .btn-today {
+      padding: 0.3em 1.25em;
+      background: #1a56db;
+      color: white;
+      border: none;
+      border-radius: 0.5em;
+      font-size: 0.9375em;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-today:hover {
+      background: #1e40af;
+    }
+
+    .btn-today:disabled {
+      background: #94a3b8;
+      cursor: default;
+    }
+
+    .main {
+      padding: 0 1.5em 6.25em;
+    }
+
+    .weekend-msg {
+      text-align: center;
+      padding: 3.75em 1.25em;
+    }
+
+    .weekend-msg h2 {
+      font-size: 1.75em;
+      color: #475569;
+      margin-bottom: 0.625em;
+    }
+
+    .weekend-msg p {
+      font-size: 1.125em;
+      color: #94a3b8;
+    }
+
+    .schedule-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 1.4vh; /* Tu tamaño original intacto */
+      table-layout: fixed;
+      background: white;
+      border-radius: 0.625em;
+      overflow: hidden;
+      box-shadow: 0 1px 0.25em rgba(0, 0, 0, 0.06);
+    }
+
+    .schedule-table th {
+      background: #608ec9;
+      color: white;
+      font-weight: 700;
+      padding: 0.75em 0.375em;
+      text-align: center;
+      border-right: 1px solid rgba(255, 255, 255, 0.15);
+      font-size: 0.9375em;
+    }
+
+    .schedule-table th:first-child {
+      background: #365885;
+      min-width: unset;
+      width: 4em;
+    }
+
+    .schedule-table th.arte {
+      background: #7742d4;
+    }
+
+    .schedule-table th.labo {
+      background: #16a34a;
+    }
+
+    .schedule-table td {
+      padding: 0.75em 0.5em;
+      text-align: center;
+      vertical-align: top;
+      border: 1px solid #e2e8f0;
+      line-height: 1.4;
+    }
+
+    .schedule-table td:first-child {
+      background: #f1f5f9;
+      font-weight: 600;
+      text-align: center;
+      vertical-align: middle;
+      width: 3.5em;
+      padding: 0.75em 0.1em; 
+    }
+
+    .schedule-table td.arte-col {
+      background: #faf5ff;
+    }
+
+    .schedule-table td.labo-col {
+      background: #f0fdf4;
+    }
+
+    .schedule-table tr.current td {
+      background: #fefce8;
+    }
+
+    .schedule-table tr.current td:first-child {
+      background: #fef9c3;
+    }
+
+    .schedule-table tr.current td.arte-col {
+      background: #fef3c7;
+    }
+
+    .schedule-table tr.current td.labo-col {
+      background: #fef3c7;
+    }
+
+    .materia {
+      font-weight: 700;
+      font-size: 1.3vh;
+      color: #1e293b;
+      display: block;
+      margin-bottom: 0.25em;
+    }
+
+    .materia-info {
+      background: #afc7eb;
+      color: #365885;
+      padding: 0.2em 0.4em;
+      border-radius: 20px;
+      border: 0px;
+      display: block;
+      margin-bottom: 0.25em;
+    }
+
+    .aula {
+      font-family: monospace;
+      font-size: 1.2vh;
+      background: #dbeafe;
+      color: #1a56db;
+      padding: 0.1875em 0.375em;
+      border-radius: 0.25em;
+      display: inline-block;
+      margin-top: 0.25em;
+    }
+
+    .aula-labo {
+      background: #fff;
+      border-width: 1px;
+      border-style: solid;
+      color: #1a56db;
+      font-weight: 700;
+      border-radius: 20px;
+    }
+
+    .profesor {
+      font-size: 1.3vh;
+      color: #64748b;
+      display: block;
+      margin-top: 0.3125em;
+    }
+
+    .asistente {
+      font-size: 1.1vh;
+      background: #dcfce7;
+      color: #166534;
+      padding: 0.1875em 0.375em;
+      border-radius: 0.25em;
+      font-weight: 600;
+      display: inline-block;
+      margin-top: 0.3125em;
+    }
+
+    .empty {
+      color: #cbd5e1;
+    }
+
+    .bloque-num {
+      font-size: 1em;
+      font-weight: 700;
+      color: #afc7eb;
+      margin-bottom: 0.125em;
+    }
+
+    .bloque-time {
+      font-size: 0.7em;
+      color: #64748b;
+      font-family: monospace;
+    }
+
+    .labo-asist {
+      background: #dcfce7;
+      border: 1px solid #86efac;
+      border-radius: 0.375em;
+      padding: 0.375em 0.625em;
+      font-weight: 700;
+      color: #166534;
+      font-size: 0.8125em;
+      margin: 0.25em 0;
+      display: inline-block;
+    }
+
+    .labo-asist small {
+      font-weight: 400;
+      font-size: 0.625em;
+      display: block;
+      color: #22c55e;
+      margin-top: 0.125em;
+    }
+
+    .curso-view {
+      background: white;
+      border-radius: 0.625em;
+      padding: 1.25em;
+      box-shadow: 0 1px 0.25em rgba(0, 0, 0, 0.06);
+    }
+
+    .curso-title {
+      font-size: 1.5em;
+      font-weight: 700;
+      color: #3156a5;
+      margin-bottom: 1.125em;
+      text-align: center;
+    }
+
+    .curso-week-table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    .curso-week-table th {
+      background: #1a56db;
+      color: white;
+      padding: 0.75em 0.5em;
+      text-align: center;
+      font-weight: 700;
+      font-size: 0.9375em;
+      border-right: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .curso-week-table th:first-child {
+      background: #1e3a8a;
+      width: 6.25em;
+    }
+
+    .curso-week-table th.today {
+      background: #16a34a;
+    }
+
+    .curso-week-table td {
+      padding: 0.75em 0.5em;
+      text-align: center;
+      vertical-align: top;
+      border: 1px solid #e2e8f0;
+      line-height: 1.4;
+    }
+
+    .curso-week-table td:first-child {
+      background: #f1f5f9;
+      font-weight: 600;
+      vertical-align: middle;
+    }
+
+    .curso-week-table td.today-col {
+      background: #f0fdf4;
+    }
+
+    .curso-week-table tr.current-row td {
+      background: #fefce8;
+    }
+
+    .curso-week-table tr.current-row td:first-child {
+      background: #fef9c3;
+    }
+
+    .curso-week-table tr.current-row td.today-col {
+      background: #bbf7d0;
+    }
+
+    .curso-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .curso-table th {
+      background: #1a56db;
+      color: white;
+      padding: 0.75em 0.875em;
+      text-align: left;
+      font-weight: 600;
+      font-size: 0.9375em;
+    }
+
+    .curso-table td {
+      padding: 0.75em 0.875em;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 0.875em;
+    }
+
+    .curso-table tr:nth-child(even) {
+      background: #f8fafc;
+    }
+
+    .curso-table tr.current-row {
+      background: #fef3c7;
+    }
+
+    .bottom-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: white;
+      border-top: 2px solid #e2e8f0;
+      padding: 0.75em 1.5em;
+      display: flex;
+      justify-content: center;
+    }
+
+    .bottom-bar .block-chip {
+      margin-right: 0.625em;
+    }
+
+    .bottom-bar .block-chip:last-child {
+      margin-right: 0;
+    }
+
+    .block-chip {
+      padding: 0.625em 1em;
+      border-radius: 0.5em;
+      font-size: 0.875em;
+      font-weight: 600;
+      background: #f1f5f9;
+      color: #64748b;
+    }
+
+    .block-chip.current {
+      background: #fef3c7;
+      color: #92400e;
+      box-shadow: 0 0 0 2px #fbbf24;
+    }
+
+    .block-chip span {
+      font-family: monospace;
+      font-size: 0.6875em;
+      display: block;
+      color: #94a3b8;
+    }
+
+    .block-chip.current span {
+      color: #b45309;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.5;
+      }
+    }
+
+    .pulse {
+      animation: pulse 2s infinite;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="top-bar">
+    <div class="top-bar-left">
+      <div class="logo">
+        <img src="infolabo.png" alt="Logo INFO">
+      </div>
+      <div>
+        <div class="title">Panel</div>
+        <div class="subtitle">Laboratorio de Informatica</div>
+      </div>
+    </div>
+    <div class="clock">
+      <div class="clock-time" id="clock-time">--:--:--</div>
+      <div class="clock-date" id="clock-date">--</div>
+    </div>
+  </div>
+
+  <div class="status-bar">
+    <div class="day-badge" id="day-badge">--</div>
+    <div class="divider"></div>
+    <div class="status-dot" id="status-dot"></div>
+    <div>
+      <div class="status-label" id="status-label">--</div>
+      <div class="status-time" id="status-time"></div>
+    </div>
+    <div class="divider" id="divider-info"></div>
+    <div class="status-info" id="status-info"></div>
+    <div class="divider" id="divider-next"></div>
+    <div class="status-info" id="status-next"></div>
+
+    <div class="filters">
+      <div class="filter-group">
+        <span class="filter-label">Dia:</span>
+        <select class="filter-select" id="day-select" onchange="onDayChange()">
+          <option value="auto">Hoy (Auto)</option>
+          <option value="1">Lunes</option>
+          <option value="2">Martes</option>
+          <option value="3">Miercoles</option>
+          <option value="4">Jueves</option>
+          <option value="5">Viernes</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">Vista:</span>
+        <select class="filter-select" id="curso-select" onchange="onCursoChange()">
+          <option value="all">Todos los cursos</option>
+          <option value="3A">3A</option>
+          <option value="3B">3B</option>
+          <option value="3C">3C</option>
+          <option value="3D">3D</option>
+          <option value="4A">4A</option>
+          <option value="4B">4B</option>
+          <option value="4C">4C</option>
+          <option value="5A">5A</option>
+          <option value="5B">5B</option>
+          <option value="5C">5C</option>
+          <option value="5D">5D</option>
+          <option value="5E">5E</option>
+        </select>
+      </div>
+      <button class="btn-today" id="btn-today" onclick="resetToToday()">Volver a Hoy</button><div id="space-text" class="space-text"></div>
+    </div>
+  </div>
+
+
+  <div class="main">
+    <div id="weekend-msg" class="weekend-msg" style="display:none;">
+      <h2>Fin de semana</h2>
+      <p>No hay clases programadas</p>
+    </div>
+    <table class="schedule-table" id="schedule-table">
+      <thead id="table-head"></thead>
+      <tbody id="table-body"></tbody>
+    </table>
+    <div class="curso-view" id="curso-view" style="display:none;">
+      <h2 class="curso-title" id="curso-title"></h2>
+      <table class="curso-week-table" id="curso-week-table">
+        <thead id="curso-week-head"></thead>
+        <tbody id="curso-week-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  
+
+  <script>
+    var DIAS_ES = ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'];
+    var CURSOS = ['3A', '3B', '3C', '3D', '4A', '4B', '4C', '5A', '5B', '5C', '5D', '5E'];
+    var selectedDay = 'auto';
+    var selectedCurso = 'all';
+
+    var BLOQUES = [
+      { n: 1, label: 'Bloque 1', start: '07:45', end: '09:05', type: 'block' },
+      { n: null, label: 'Recreo', start: '09:05', end: '09:20', type: 'break' },
+      { n: 2, label: 'Bloque 2', start: '09:20', end: '10:40', type: 'block' },
+      { n: null, label: 'Recreo', start: '10:40', end: '10:55', type: 'break' },
+      { n: 3, label: 'Bloque 3', start: '10:55', end: '12:15', type: 'block' },
+      { n: null, label: 'Almuerzo', start: '12:15', end: '13:10', type: 'lunch' },
+      { n: 4, label: 'Bloque 4', start: '13:10', end: '14:30', type: 'block' },
+      { n: null, label: 'Recreo', start: '14:30', end: '14:40', type: 'break' },
+      { n: 5, label: 'Bloque 5', start: '14:40', end: '16:00', type: 'block' },
+      { n: null, label: 'Recreo', start: '16:00', end: '16:10', type: 'break' },
+      { n: 6, label: 'Bloque 6', start: '16:10', end: '17:30', type: 'block' }
+    ];
+
+    var BLOCK_SLOTS = [];
+    for (var i = 0; i < BLOQUES.length; i++) { if (BLOQUES[i].type === 'block') BLOCK_SLOTS.push(BLOQUES[i]); }
+
+    var CLASES = [
+      // LUNES - Bloque 1
+      { dayIdx: 1, bloque: 1, curso: "3A", materia: "TI", aula: "1103", profesor: "Olivera" },
+      { dayIdx: 1, bloque: 1, curso: "3B", materia: "TI", aula: "1104", profesor: "Stancanelli" },
+      { dayIdx: 1, bloque: 1, curso: "3C", materia: "ED.FISICA", aula: "Gimnasio", profesor: "Charnis" },
+      { dayIdx: 1, bloque: 1, curso: "3D", materia: " HISTORIA ", aula: "1106", profesor: "Open" },
+      { dayIdx: 1, bloque: 1, curso: "4A", materia: "H.JUDIA", aula: "1303", profesor: "Marchi" },
+      { dayIdx: 1, bloque: 1, curso: "4B", materia: "ED.FISICA", aula: "Gimnasio", profesor: "Goldfinger" },
+      { dayIdx: 1, bloque: 1, curso: "4C", materia: "H.JUDIA", aula: "1301", profesor: "Faerverger" },
+      { dayIdx: 1, bloque: 1, curso: "5A", materia: "DAI", aula: "AMI", profesor: "Goldfeld / Peña" },
+      { dayIdx: 1, bloque: 1, curso: "5B", materia: "DAI", aula: "CEO", profesor: "Rodriguez / Munich" },
+      { dayIdx: 1, bloque: 1, curso: "5C", materia: "PDP", aula: "CIDI IZQ", profesor: "Snieg / Segaloff" },
+      { dayIdx: 1, bloque: 1, curso: "5D", materia: "PDP", aula: "CIDI DER", profesor: "Turek / Guivi" },
+      { dayIdx: 1, bloque: 1, curso: "5E", materia: "DAI", aula: "LUM", profesor: "Ulman / Waksberg" },
+      { dayIdx: 1, bloque: 1, curso: "ARTE", materia: "2F/2K", aula: "AULA", profesor: "Flaminio" },
+      // LUNES - Bloque 2
+      { dayIdx: 1, bloque: 2, curso: "3A", materia: "GEOGRAFIA", aula: "1103", profesor: "Scarcella" },
+      { dayIdx: 1, bloque: 2, curso: "3B", materia: "TI", aula: "1104", profesor: "Stancanelli" },
+      { dayIdx: 1, bloque: 2, curso: "3C", materia: "LENGUA", aula: "1105", profesor: "Bochatay" },
+      { dayIdx: 1, bloque: 2, curso: "3D", materia: "H.JUDIA", aula: "1106", profesor: "Lichtenstein" },
+      { dayIdx: 1, bloque: 2, curso: "4A", materia: " HISTORIA ", aula: "1303", profesor: "Levy" },
+      { dayIdx: 1, bloque: 2, curso: "4B", materia: "FUENTES", aula: "1302", profesor: "Guerschuny" },
+      { dayIdx: 1, bloque: 2, curso: "4C", materia: "ETICA", aula: "1301", profesor: "Marchi" },
+      { dayIdx: 1, bloque: 2, curso: "5A", materia: "DAI", aula: "AMI", profesor: "Goldfeld / Peña" },
+      { dayIdx: 1, bloque: 2, curso: "5B", materia: "DAI", aula: "CEO", profesor: "Rodriguez / Munich" },
+      { dayIdx: 1, bloque: 2, curso: "5C", materia: "PDP", aula: "CIDI IZQ", profesor: "Arias / Segaloff" },
+      { dayIdx: 1, bloque: 2, curso: "5D", materia: "PDP", aula: "CIDI DER", profesor: "Turek / Guivi" },
+      { dayIdx: 1, bloque: 2, curso: "5E", materia: "DAI", aula: "LUM", profesor: "Ulman / Waksberg" },
+      // LUNES - Bloque 3
+      { dayIdx: 1, bloque: 3, curso: "3A", materia: "FISICA", aula: "1103", profesor: "Failache" },
+      { dayIdx: 1, bloque: 3, curso: "3B", materia: "H.JUDIA", aula: "1104", profesor: "Lichtenstein" },
+      { dayIdx: 1, bloque: 3, curso: "3C", materia: "TI", aula: "1105", profesor: "Stancanelli" },
+      { dayIdx: 1, bloque: 3, curso: "3D", materia: "LENGUA", aula: "1106", profesor: "Galperin" },
+      { dayIdx: 1, bloque: 3, curso: "4A", materia: "ED.FISICA", aula: "Gimnasio", profesor: "Slaibe" },
+      { dayIdx: 1, bloque: 3, curso: "4B", materia: " HISTORIA ", aula: "1302", profesor: "Marchi" },
+      { dayIdx: 1, bloque: 3, curso: "4C", materia: "GEOGRAFIA", aula: "1301", profesor: "Santacruz" },
+      { dayIdx: 1, bloque: 3, curso: "5A", materia: "PDP", aula: "HMP", profesor: "Arias / Segaloff" },
+      { dayIdx: 1, bloque: 3, curso: "5B", materia: "PDP", aula: "CIDI IZQ", profesor: "Turek / Guivi" },
+      { dayIdx: 1, bloque: 3, curso: "5C", materia: "DAI", aula: "CEO", profesor: "Rodriguez / Munich" },
+      { dayIdx: 1, bloque: 3, curso: "5D", materia: "DAI", aula: "AMI", profesor: "Goldfeld / Waksberg" },
+      { dayIdx: 1, bloque: 3, curso: "5E", materia: "PDP", aula: "CIDI DER", profesor: "Peña / Ulman" },
+      { dayIdx: 1, bloque: 3, curso: "ARTE", materia: "2A/2C", aula: "LUM", profesor: "Flaminio" },
+      // LUNES - Bloque 4
+      { dayIdx: 1, bloque: 4, curso: "3A", materia: "MATEMATICA", aula: "1103", profesor: "Liberto" },
+      { dayIdx: 1, bloque: 4, curso: "3B", materia: "PROG", aula: "AMI", profesor: "Olivera" },
+      { dayIdx: 1, bloque: 4, curso: "3C", materia: "FUENTES", aula: "1105", profesor: "Chojrin" },
+      { dayIdx: 1, bloque: 4, curso: "3D", materia: "PROG", aula: "HMP / CIDI IZQ", profesor: "Stancanelli" },
+      { dayIdx: 1, bloque: 4, curso: "4A", materia: "EFSI", aula: "LUM", profesor: "Arias / Flaminio" },
+      { dayIdx: 1, bloque: 4, curso: "4B", materia: "BD", aula: "CIDI DER", profesor: "Rodriguez" },
+      { dayIdx: 1, bloque: 4, curso: "5A", materia: "QUIMICA", aula: "1302", profesor: "Stark" },
+      { dayIdx: 1, bloque: 4, curso: "5B", materia: "H.JUDIA", aula: "1304", profesor: "Faerverger" },
+      { dayIdx: 1, bloque: 4, curso: "5C", materia: "MATEMATICA", aula: "1106", profesor: "Romano" },
+      { dayIdx: 1, bloque: 4, curso: "5D", materia: "EFSI II", aula: "CEO", profesor: "Peña" },
+      { dayIdx: 1, bloque: 4, curso: "5E", materia: "H.JUDIA", aula: "1104", profesor: "Mitelman" },
+      // LUNES - Bloque 5
+      { dayIdx: 1, bloque: 5, curso: "3A", materia: "LENGUA", aula: "1103", profesor: "Szyszlican" },
+      { dayIdx: 1, bloque: 5, curso: "3B", materia: "PROG", aula: "AMI", profesor: "Olivera" },
+      { dayIdx: 1, bloque: 5, curso: "3C", materia: "MATEMATICA", aula: "1105", profesor: "Bica Diaz" },
+      { dayIdx: 1, bloque: 5, curso: "3D", materia: "PROG", aula: "HMP / CIDI IZQ", profesor: "Stancanelli" },
+      { dayIdx: 1, bloque: 5, curso: "4A", materia: "EFSI", aula: "LUM", profesor: "Arias" },
+      { dayIdx: 1, bloque: 5, curso: "4B", materia: "GEOGRAFIA", aula: "1303", profesor: "Baigorria" },
+      { dayIdx: 1, bloque: 5, curso: "5A", materia: "H.JUDIA", aula: "1302", profesor: "Jmelnizky" },
+      { dayIdx: 1, bloque: 5, curso: "5B", materia: "ED.FISICA", aula: "Gimnasio", profesor: "Slaibe" },
+      { dayIdx: 1, bloque: 5, curso: "5D", materia: "EFSI II", aula: "CEO", profesor: "Peña" },
+      { dayIdx: 1, bloque: 5, curso: "5E", materia: "QUIMICA", aula: "1104", profesor: "Stark" },
+      // LUNES - Bloque 6
+      { dayIdx: 1, bloque: 6, curso: "3A", materia: "INGLES", aula: "1103", profesor: "" },
+      { dayIdx: 1, bloque: 6, curso: "3B", materia: "INGLES", aula: "1104", profesor: "" },
+      { dayIdx: 1, bloque: 6, curso: "3C", materia: "INGLES", aula: "1105", profesor: "" },
+      { dayIdx: 1, bloque: 6, curso: "3D", materia: "INGLES", aula: "1106", profesor: "" },
+      { dayIdx: 1, bloque: 6, curso: "4A", materia: "LENGUA", aula: "CEO", profesor: "Landini" },
+      // MARTES - Bloque 1
+      { dayIdx: 2, bloque: 1, curso: "3A", materia: "H.JUDIA", aula: "1103", profesor: "Wolfus" },
+      { dayIdx: 2, bloque: 1, curso: "3B", materia: "MATEMATICA", aula: "1104", profesor: "Lacusant" },
+      { dayIdx: 2, bloque: 1, curso: "3C", materia: "H.JUDIA", aula: "1105", profesor: "Lichtenstein" },
+      { dayIdx: 2, bloque: 1, curso: "3D", materia: "IMAGEN", aula: "AMI", profesor: "Zapolski" },
+      { dayIdx: 2, bloque: 1, curso: "4A", materia: "PROG", aula: "LUM", profesor: "Binker" },
+      { dayIdx: 2, bloque: 1, curso: "4B", materia: "PROG", aula: "HMP / CIDI IZQ", profesor: "Kristal" },
+      { dayIdx: 2, bloque: 1, curso: "4C", materia: "EFSI", aula: "CEO", profesor: "Robbiano / Arias" },
+      { dayIdx: 2, bloque: 1, curso: "5A", materia: "SEMINARIO", aula: "1303", profesor: "Stancanelli" },
+      { dayIdx: 2, bloque: 1, curso: "5B", materia: "TEI", aula: "1304", profesor: "Glinsky" },
+      { dayIdx: 2, bloque: 1, curso: "5C", materia: "EFSI II", aula: "1301 / CIDI DER", profesor: "Esses" },
+      { dayIdx: 2, bloque: 1, curso: "5D", materia: "H.JUDIA", aula: "1106", profesor: "Faerverger" },
+      { dayIdx: 2, bloque: 1, curso: "5E", materia: "TEI", aula: "1302", profesor: "Podrojsky" },
+      { dayIdx: 2, bloque: 1, curso: "ARTE", materia: "2I/2O", aula: "AULA", profesor: "Flaminio" },
+      // MARTES - Bloque 2
+      { dayIdx: 2, bloque: 2, curso: "3A", materia: "IMAGEN", aula: "AMI", profesor: "Arias / Zapolski" },
+      { dayIdx: 2, bloque: 2, curso: "3B", materia: "ETICA", aula: "1104", profesor: "Torres Sanetra" },
+      { dayIdx: 2, bloque: 2, curso: "3C", materia: "PROG", aula: "LUM", profesor: "Kristal" },
+      { dayIdx: 2, bloque: 2, curso: "3D", materia: "BIOLOGIA", aula: "1106", profesor: "Souza" },
+      { dayIdx: 2, bloque: 2, curso: "4A", materia: "FUENTES", aula: "1303", profesor: "Dabas" },
+      { dayIdx: 2, bloque: 2, curso: "4B", materia: "ETICA", aula: "1302", profesor: "Marchi" },
+      { dayIdx: 2, bloque: 2, curso: "4C", materia: "ED.FISICA", aula: "Gimnasio", profesor: "Niborski" },
+      { dayIdx: 2, bloque: 2, curso: "5A", materia: "TEI", aula: "1103", profesor: "Podrojsky" },
+      { dayIdx: 2, bloque: 2, curso: "5B", materia: "H.JUDIA", aula: "1304", profesor: "Faerverger" },
+      { dayIdx: 2, bloque: 2, curso: "5C", materia: "EFSI II", aula: "1301 / CIDI DER", profesor: "Esses" },
+      { dayIdx: 2, bloque: 2, curso: "5D", materia: "TEI", aula: "1105", profesor: "Glinsky" },
+      { dayIdx: 2, bloque: 2, curso: "5E", materia: "EFSI", aula: "CEO", profesor: "Peña" },
+      // MARTES - Bloque 3
+      { dayIdx: 2, bloque: 3, curso: "3A", materia: "BIOLOGIA", aula: "1103", profesor: "Rapalini" },
+      { dayIdx: 2, bloque: 3, curso: "3B", materia: "ED.FISICA", aula: "Gimnasio", profesor: "Matorras" },
+      { dayIdx: 2, bloque: 3, curso: "3C", materia: "ETICA", aula: "1105", profesor: "Zabalza" },
+      { dayIdx: 2, bloque: 3, curso: "3D", materia: "H.JUDIA", aula: "1106", profesor: "Lichtenstein" },
+      { dayIdx: 2, bloque: 3, curso: "4A", materia: "FISICA", aula: "4210", profesor: "Riccardi" },
+      { dayIdx: 2, bloque: 3, curso: "4B", materia: "EFSI", aula: "AMI", profesor: "Zapolski / Arias" },
+      { dayIdx: 2, bloque: 3, curso: "4C", materia: "H.JUDIA", aula: "1301", profesor: "Faerverger" },
+      { dayIdx: 2, bloque: 3, curso: "5A", materia: "LENGUA", aula: "1104", profesor: "Bochatay" },
+      { dayIdx: 2, bloque: 3, curso: "5B", materia: "LENGUA", aula: "1304", profesor: "Costa" },
+      { dayIdx: 2, bloque: 3, curso: "5C", materia: "TEI", aula: "4002", profesor: "Waksberg" },
+      { dayIdx: 2, bloque: 3, curso: "5D", materia: "HISTORIA", aula: "LUM", profesor: "Stancanelli" },
+      { dayIdx: 2, bloque: 3, curso: "5E", materia: "EFSI", aula: "CEO", profesor: "Peña" },
+      // MARTES - Bloque 4
+      { dayIdx: 2, bloque: 4, curso: "3A", materia: "FUENTES", aula: "1103", profesor: "Daich" },
+      { dayIdx: 2, bloque: 4, curso: "3B", materia: "LENGUA", aula: "1104", profesor: "Garavello" },
+      { dayIdx: 2, bloque: 4, curso: "3C", materia: "IMAGEN", aula: "AMI", profesor: "Arias / Rosales" },
+      { dayIdx: 2, bloque: 4, curso: "3D", materia: "SSI", aula: "1106", profesor: "Asman" },
+      { dayIdx: 2, bloque: 4, curso: "4A", materia: "INGLES", aula: "1303", profesor: "" },
+      { dayIdx: 2, bloque: 4, curso: "4B", materia: "INGLES", aula: "1302", profesor: "" },
+      { dayIdx: 2, bloque: 4, curso: "4C", materia: "INGLES", aula: "1301", profesor: "" },
+      { dayIdx: 2, bloque: 4, curso: "5A", materia: "EFSI", aula: "LUM", profesor: "Rodriguez" },
+      { dayIdx: 2, bloque: 4, curso: "5B", materia: "HISTORIA", aula: "CEO", profesor: "Stancanelli" },
+      { dayIdx: 2, bloque: 4, curso: "5C", materia: "QUIMICA", aula: "1105", profesor: "Macri" },
+      { dayIdx: 2, bloque: 4, curso: "5D", materia: "MATEMATICA", aula: "1304", profesor: "Montenegro" },
+      { dayIdx: 2, bloque: 4, curso: "5E", materia: "LENGUA", aula: "1110", profesor: "Rugilo" },
+      // MARTES - Bloque 5
+      { dayIdx: 2, bloque: 5, curso: "3B", materia: "SSI", aula: "1104", profesor: "Asman" },
+      { dayIdx: 2, bloque: 5, curso: "3C", materia: " HISTORIA ", aula: "1105", profesor: "Soto Bouhier" },
+      { dayIdx: 2, bloque: 5, curso: "3D", materia: "PROG", aula: "CEO", profesor: "Stancanelli" },
+      { dayIdx: 2, bloque: 5, curso: "4B", materia: "LENGUA", aula: "1302", profesor: "Szyszlican" },
+      { dayIdx: 2, bloque: 5, curso: "4C", materia: "FISICA", aula: "4210", profesor: "Samper" },
+      { dayIdx: 2, bloque: 5, curso: "5A", materia: "EFSI", aula: "LUM", profesor: "Rodriguez" },
+      { dayIdx: 2, bloque: 5, curso: "5B", materia: "MATEMATICA", aula: "1304", profesor: "Lacusant" },
+      { dayIdx: 2, bloque: 5, curso: "5C", materia: "LENGUA", aula: "1303", profesor: "Moretti" },
+      { dayIdx: 2, bloque: 5, curso: "5D", materia: "QUIMICA", aula: "1106", profesor: "Macri" },
+      { dayIdx: 2, bloque: 5, curso: "5E", materia: "MATEMATICA", aula: "1103", profesor: "Romano" },
+      // MARTES - Bloque 6
+      { dayIdx: 2, bloque: 6, curso: "5A", materia: "INGLES", aula: "1103", profesor: "" },
+      { dayIdx: 2, bloque: 6, curso: "5B", materia: "INGLES", aula: "1304", profesor: "" },
+      { dayIdx: 2, bloque: 6, curso: "5C", materia: "INGLES", aula: "1104", profesor: "" },
+      { dayIdx: 2, bloque: 6, curso: "5D", materia: "INGLES", aula: "1105", profesor: "" },
+      { dayIdx: 2, bloque: 6, curso: "5E", materia: "INGLES", aula: "1106", profesor: "" },
+      // MIERCOLES - Bloque 1
+      { dayIdx: 3, bloque: 1, curso: "3A", materia: "FISICA", aula: "4210", profesor: "Failache" },
+      { dayIdx: 3, bloque: 1, curso: "3B", materia: "MATEMATICA", aula: "1104", profesor: "Lacusant" },
+      { dayIdx: 3, bloque: 1, curso: "3C", materia: "TI", aula: "1105", profesor: "Stancanelli / Ceriana" },
+      { dayIdx: 3, bloque: 1, curso: "3D", materia: "ECONOMIA", aula: "1106", profesor: "Farbiarz" },
+      { dayIdx: 3, bloque: 1, curso: "4A", materia: "PROG", aula: "1303 / CIDI IZQ", profesor: "Binker" },
+      { dayIdx: 3, bloque: 1, curso: "4B", materia: "PROG", aula: "1304 / CIDI DER", profesor: "Kristal" },
+      { dayIdx: 3, bloque: 1, curso: "4C", materia: "PROG", aula: "HMP", profesor: "Jolodovsky" },
+      { dayIdx: 3, bloque: 1, curso: "5A", materia: "EFSI", aula: "LUM", profesor: "Rodriguez" },
+      { dayIdx: 3, bloque: 1, curso: "5B", materia: "EFSI", aula: "AMI", profesor: "Snieg" },
+      { dayIdx: 3, bloque: 1, curso: "5C", materia: "H.JUDIA", aula: "1301", profesor: "Luna" },
+      { dayIdx: 3, bloque: 1, curso: "5D", materia: "EFSI", aula: "CEO", profesor: "Peña" },
+      { dayIdx: 3, bloque: 1, curso: "5E", materia: "MATEMATICA", aula: "1302", profesor: "Romano" },
+      // MIERCOLES - Bloque 2
+      { dayIdx: 3, bloque: 2, curso: "3A", materia: "ECONOMIA", aula: "1103", profesor: "" },
+      { dayIdx: 3, bloque: 2, curso: "3B", materia: "IMAGEN", aula: "HMP / CIDI DER", profesor: "Rosales" },
+      { dayIdx: 3, bloque: 2, curso: "3C", materia: "IMAGEN", aula: "LUM", profesor: "Arias" },
+      { dayIdx: 3, bloque: 2, curso: "3D", materia: "TI", aula: "1106", profesor: "Ceriana" },
+      { dayIdx: 3, bloque: 2, curso: "4A", materia: "BD", aula: "CEO", profesor: "Kristal / Peña" },
+      { dayIdx: 3, bloque: 2, curso: "4B", materia: "H.JUDIA", aula: "1302", profesor: "Marchi" },
+      { dayIdx: 3, bloque: 2, curso: "4C", materia: "LENGUA", aula: "1301", profesor: "Hughes Rojas" },
+      { dayIdx: 3, bloque: 2, curso: "5A", materia: "QUIMICA", aula: "1303", profesor: "Stark" },
+      { dayIdx: 3, bloque: 2, curso: "5B", materia: "EFSI", aula: "AMI", profesor: "Snieg" },
+      { dayIdx: 3, bloque: 2, curso: "5C", materia: "FUENTES", aula: "1304", profesor: "Dabas" },
+      { dayIdx: 3, bloque: 2, curso: "5D", materia: "SEMINARIO", aula: "1104 / CIDI IZQ", profesor: "Stancanelli" },
+      { dayIdx: 3, bloque: 2, curso: "5E", materia: "FILOSOFIA", aula: "1105", profesor: "Antmann" },
+      // MIERCOLES - Bloque 3
+      { dayIdx: 3, bloque: 3, curso: "3A", materia: "ETICA", aula: "1103", profesor: "Zabalza" },
+      { dayIdx: 3, bloque: 3, curso: "3B", materia: "FISICA", aula: "4207", profesor: "Failache" },
+      { dayIdx: 3, bloque: 3, curso: "3C", materia: "BIOLOGIA", aula: "1105", profesor: "Rapalini" },
+      { dayIdx: 3, bloque: 3, curso: "3D", materia: "MATEMATICA", aula: "1106", profesor: "Insfran" },
+      { dayIdx: 3, bloque: 3, curso: "4A", materia: "EFSI", aula: "AMI", profesor: "Arias" },
+      { dayIdx: 3, bloque: 3, curso: "4B", materia: "FISICA", aula: "4210", profesor: "Samper" },
+      { dayIdx: 3, bloque: 3, curso: "4C", materia: "TI", aula: "HMP / CIDI DER", profesor: "Ceriana" },
+      { dayIdx: 3, bloque: 3, curso: "5A", materia: "MATEMATICA", aula: "1301", profesor: "Blatman" },
+      { dayIdx: 3, bloque: 3, curso: "5B", materia: "SEMINARIO", aula: "LUM", profesor: "Stancanelli" },
+      { dayIdx: 3, bloque: 3, curso: "5C", materia: "MATEMATICA", aula: "1304", profesor: "Romano" },
+      { dayIdx: 3, bloque: 3, curso: "5D", materia: "FILOSOFIA", aula: "1303", profesor: "Antmann" },
+      { dayIdx: 3, bloque: 3, curso: "5E", materia: "EFSI", aula: "CEO", profesor: "Peña" },
+      // MIERCOLES - Bloque 4
+      { dayIdx: 3, bloque: 4, curso: "3A", materia: "IMAGEN", aula: "CEO", profesor: "Arias" },
+      { dayIdx: 3, bloque: 4, curso: "3B", materia: "LENGUA", aula: "1104", profesor: "Garavello" },
+      { dayIdx: 3, bloque: 4, curso: "3C", materia: "MATEMATICA", aula: "1105", profesor: "Bica Diaz" },
+      { dayIdx: 3, bloque: 4, curso: "3D", materia: "ED.FISICA", aula: "Gimnasio", profesor: "Matorras" },
+      { dayIdx: 3, bloque: 4, curso: "4A", materia: "MATEMATICA", aula: "1303", profesor: "Brizuela" },
+      { dayIdx: 3, bloque: 4, curso: "4B", materia: "BD", aula: "HMP / CIDI IZQ", profesor: "Rodriguez" },
+      { dayIdx: 3, bloque: 4, curso: "4C", materia: "ARTE", aula: "AMI", profesor: "Ceriana" },
+      { dayIdx: 3, bloque: 4, curso: "5A", materia: "ED.FISICA", aula: "Gimnasio", profesor: "Slaibe" },
+      { dayIdx: 3, bloque: 4, curso: "5B", materia: "FILOSOFIA", aula: "1304", profesor: "Langenauer" },
+      { dayIdx: 3, bloque: 4, curso: "5C", materia: "SEMINARIO", aula: "LUM", profesor: "Stancanelli" },
+      { dayIdx: 3, bloque: 4, curso: "5D", materia: "FUENTES", aula: "1103", profesor: "Faur" },
+      { dayIdx: 3, bloque: 4, curso: "5E", materia: "H.JUDIA", aula: "1106", profesor: "Mitelman" },
+      // MIERCOLES - Bloque 5
+      { dayIdx: 3, bloque: 5, curso: "3A", materia: "PROG", aula: "CEO", profesor: "Stancanelli" },
+      { dayIdx: 3, bloque: 5, curso: "3D", materia: "FUENTES", aula: "1106", profesor: "Laufer" },
+      { dayIdx: 3, bloque: 5, curso: "4A", materia: "GEOGRAFIA", aula: "1303", profesor: "Baigorria" },
+      { dayIdx: 3, bloque: 5, curso: "4B", materia: "ARTE", aula: "AMI", profesor: "Ceriana / Arias" },
+      { dayIdx: 3, bloque: 5, curso: "4C", materia: "FUENTES", aula: "1301", profesor: "Faur" },
+      { dayIdx: 3, bloque: 5, curso: "5A", materia: "INGLES", aula: "1103", profesor: "" },
+      { dayIdx: 3, bloque: 5, curso: "5B", materia: "INGLES", aula: "1304", profesor: "" },
+      { dayIdx: 3, bloque: 5, curso: "5C", materia: "INGLES", aula: "1104", profesor: "" },
+      { dayIdx: 3, bloque: 5, curso: "5D", materia: "INGLES", aula: "1105", profesor: "" },
+      { dayIdx: 3, bloque: 5, curso: "5E", materia: "INGLES", aula: "1302", profesor: "" },
+      { dayIdx: 3, bloque: 5, curso: "ARTE", materia: "2J/2P", aula: "LUM", profesor: "Goldfeld" },
+      // MIERCOLES - Bloque 6
+      { dayIdx: 3, bloque: 6, curso: "3A", materia: "ED.FISICA", aula: "Gimnasio", profesor: "Cella" },
+      { dayIdx: 3, bloque: 6, curso: "4A", materia: "INGLES", aula: "1303", profesor: "" },
+      { dayIdx: 3, bloque: 6, curso: "4B", materia: "INGLES", aula: "1302", profesor: "" },
+      { dayIdx: 3, bloque: 6, curso: "4C", materia: "INGLES", aula: "1301", profesor: "" },
+      { dayIdx: 3, bloque: 6, curso: "5E", materia: "SEMINARIO", aula: "CEO", profesor: "Ceriana" },
+      // JUEVES - Bloque 1
+      { dayIdx: 4, bloque: 1, curso: "3A", materia: "TI", aula: "1103", profesor: "Olivera / Ceriana" },
+      { dayIdx: 4, bloque: 1, curso: "3B", materia: "FUENTES", aula: "1104", profesor: "Guerschuny" },
+      { dayIdx: 4, bloque: 1, curso: "3C", materia: "H.JUDIA", aula: "1105", profesor: "Lichtenstein" },
+      { dayIdx: 4, bloque: 1, curso: "3D", materia: "FISICA", aula: "1106", profesor: "Galperin" },
+      { dayIdx: 4, bloque: 1, curso: "4A", materia: "PROG", aula: "AMI", profesor: "Binker" },
+      { dayIdx: 4, bloque: 1, curso: "4B", materia: "PROG", aula: "LUM", profesor: "Kristal" },
+      { dayIdx: 4, bloque: 1, curso: "4C", materia: "PROG", aula: "CEO", profesor: "Jolodovsky" },
+      { dayIdx: 4, bloque: 1, curso: "5A", materia: "HISTORIA", aula: "1301", profesor: "Stancanelli" },
+      { dayIdx: 4, bloque: 1, curso: "5B", materia: "FUENTES", aula: "1304", profesor: "Dabas" },
+      { dayIdx: 4, bloque: 1, curso: "5C", materia: "EFSI", aula: "HMP / CIDI DER", profesor: "Esses" },
+      { dayIdx: 4, bloque: 1, curso: "5D", materia: "MATEMATICA", aula: "1302", profesor: "Montenegro" },
+      { dayIdx: 4, bloque: 1, curso: "5E", materia: "FUENTES", aula: "1303", profesor: "Falak" },
+      { dayIdx: 4, bloque: 1, curso: "ARTE", materia: "2B/2G", aula: "LABO ED4 (4002)", profesor: "Dejtiar" },
+      // JUEVES - Bloque 2
+      { dayIdx: 4, bloque: 2, curso: "3A", materia: "MATEMATICA", aula: "1103", profesor: "Liberto" },
+      { dayIdx: 4, bloque: 2, curso: "3B", materia: "BIOLOGIA", aula: "1104", profesor: "Rapalini" },
+      { dayIdx: 4, bloque: 2, curso: "3C", materia: "PROG", aula: "CEO", profesor: "Kristal" },
+      { dayIdx: 4, bloque: 2, curso: "3D", materia: "ETICA", aula: "1106", profesor: "Arcuschin" },
+      { dayIdx: 4, bloque: 2, curso: "4A", materia: "LENGUA", aula: "1303", profesor: "Landini" },
+      { dayIdx: 4, bloque: 2, curso: "4B", materia: "MATEMATICA", aula: "1302", profesor: "Contreras" },
+      { dayIdx: 4, bloque: 2, curso: "4C", materia: " HISTORIA ", aula: "1301", profesor: "Marchi" },
+      { dayIdx: 4, bloque: 2, curso: "5A", materia: "MATEMATICA", aula: "1304", profesor: "Blatman" },
+      { dayIdx: 4, bloque: 2, curso: "5B", materia: "EFSI", aula: "AMI", profesor: "Snieg" },
+      { dayIdx: 4, bloque: 2, curso: "5C", materia: "ED.FISICA", aula: "Gimnasio", profesor: "Charnis" },
+      { dayIdx: 4, bloque: 2, curso: "5D", materia: "H.JUDIA", aula: "1105", profesor: "Faerverger" },
+      { dayIdx: 4, bloque: 2, curso: "5E", materia: "HISTORIA", aula: "HMP / CIDI DER", profesor: "Stancanelli" },
+      { dayIdx: 4, bloque: 2, curso: "ARTE", materia: "2L/2N", aula: "LUM", profesor: "Dejtiar" },
+      // JUEVES - Bloque 3
+      { dayIdx: 4, bloque: 3, curso: "3A", materia: "SSI", aula: "1103", profesor: "Asman" },
+      { dayIdx: 4, bloque: 3, curso: "3B", materia: "IMAGEN", aula: "AMI", profesor: "Rosales / Dejtiar" },
+      { dayIdx: 4, bloque: 3, curso: "3C", materia: "PROG", aula: "CEO", profesor: "Kristal" },
+      { dayIdx: 4, bloque: 3, curso: "3D", materia: "TI", aula: "1106", profesor: "Ceriana" },
+      { dayIdx: 4, bloque: 3, curso: "4A", materia: "ETICA", aula: "1303", profesor: "Levy" },
+      { dayIdx: 4, bloque: 3, curso: "4B", materia: "H.JUDIA", aula: "1302", profesor: "Marchi" },
+      { dayIdx: 4, bloque: 3, curso: "4C", materia: "MATEMATICA", aula: "1301", profesor: "Contreras" },
+      { dayIdx: 4, bloque: 3, curso: "5A", materia: "H.JUDIA", aula: "1101", profesor: "Jmelnizky" },
+      { dayIdx: 4, bloque: 3, curso: "5B", materia: "MATEMATICA", aula: "1304", profesor: "Lacusant" },
+      { dayIdx: 4, bloque: 3, curso: "5C", materia: "HISTORIA", aula: "HMP / CIDI DER", profesor: "Stancanelli" },
+      { dayIdx: 4, bloque: 3, curso: "5D", materia: "QUIMICA", aula: "1105", profesor: "Macri" },
+      { dayIdx: 4, bloque: 3, curso: "5E", materia: "LENGUA", aula: "1104", profesor: "Rugilo" },
+      { dayIdx: 4, bloque: 3, curso: "ARTE", materia: "2D/2H", aula: "LUM", profesor: "Flaminio" },
+      // JUEVES - Bloque 4
+      { dayIdx: 4, bloque: 4, curso: "3A", materia: "PROG", aula: "AMI", profesor: "Stancanelli" },
+      { dayIdx: 4, bloque: 4, curso: "3B", materia: "FISICA", aula: "1104", profesor: "Failache" },
+      { dayIdx: 4, bloque: 4, curso: "3C", materia: "SSI", aula: "1105", profesor: "Olivera" },
+      { dayIdx: 4, bloque: 4, curso: "3D", materia: "LENGUA", aula: "1106", profesor: "Galperin" },
+      { dayIdx: 4, bloque: 4, curso: "4A", materia: "FISICA", aula: "1303", profesor: "Riccardi" },
+      { dayIdx: 4, bloque: 4, curso: "4B", materia: "TI", aula: "CEO", profesor: "Ceriana" },
+      { dayIdx: 4, bloque: 4, curso: "4C", materia: "EFSI", aula: "LUM", profesor: "Robbiano" },
+      { dayIdx: 4, bloque: 4, curso: "5A", materia: "FILOSOFIA", aula: "1302", profesor: "Cohen" },
+      { dayIdx: 4, bloque: 4, curso: "5B", materia: "QUIMICA", aula: "1304", profesor: "Otero" },
+      { dayIdx: 4, bloque: 4, curso: "5C", materia: "LENGUA", aula: "1301", profesor: "Moretti" },
+      { dayIdx: 4, bloque: 4, curso: "5D", materia: "ED.FISICA", aula: "Gimnasio", profesor: "Cella" },
+      { dayIdx: 4, bloque: 4, curso: "5E", materia: "QUIMICA", aula: "1103", profesor: "Stark" },
+      // JUEVES - Bloque 5
+      { dayIdx: 4, bloque: 5, curso: "3A", materia: "PROG", aula: "AMI", profesor: "Stancanelli" },
+      { dayIdx: 4, bloque: 5, curso: "3B", materia: "PROG", aula: "HMP / CIDI IZQ", profesor: "Olivera" },
+      { dayIdx: 4, bloque: 5, curso: "3C", materia: "FISICA", aula: "4210", profesor: "Melieni" },
+      { dayIdx: 4, bloque: 5, curso: "3D", materia: "MATEMATICA", aula: "1106", profesor: "Insfran" },
+      { dayIdx: 4, bloque: 5, curso: "4A", materia: "TI", aula: "CEO", profesor: "Ceriana" },
+      { dayIdx: 4, bloque: 5, curso: "4C", materia: "EFSI", aula: "LUM", profesor: "Robbiano" },
+      { dayIdx: 4, bloque: 5, curso: "5C", materia: "FILOSOFIA", aula: "1301", profesor: "Cohen" },
+      { dayIdx: 4, bloque: 5, curso: "5D", materia: "LENGUA", aula: "1103", profesor: "Marti" },
+      { dayIdx: 4, bloque: 5, curso: "5E", materia: "ED.FISICA", aula: "Gimnasio", profesor: "" },
+      // JUEVES - Bloque 6
+      { dayIdx: 4, bloque: 6, curso: "3A", materia: "INGLES", aula: "1103", profesor: "" },
+      { dayIdx: 4, bloque: 6, curso: "3B", materia: "INGLES", aula: "1104", profesor: "" },
+      { dayIdx: 4, bloque: 6, curso: "3C", materia: "INGLES", aula: "1105", profesor: "" },
+      { dayIdx: 4, bloque: 6, curso: "3D", materia: "INGLES", aula: "1106", profesor: "" },
+      { dayIdx: 4, bloque: 6, curso: "4A", materia: "ARTE", aula: "CEO", profesor: "Ceriana" },
+      { dayIdx: 4, bloque: 6, curso: "4C", materia: "LENGUA", aula: "1301", profesor: "Hughes Rojas" },
+      { dayIdx: 4, bloque: 6, curso: "5C", materia: "QUIMICA", aula: "1302", profesor: "Macri" },
+      // VIERNES - Bloque 1
+      { dayIdx: 5, bloque: 1, curso: "3A", materia: "LENGUA", aula: "1103", profesor: "Szyszlican" },
+      { dayIdx: 5, bloque: 1, curso: "3B", materia: " HISTORIA ", aula: "1104", profesor: "Perrone" },
+      { dayIdx: 5, bloque: 1, curso: "3C", materia: "GEOGRAFIA", aula: "1105", profesor: "Sivila Gil" },
+      { dayIdx: 5, bloque: 1, curso: "3D", materia: "GEOGRAFIA", aula: "1106", profesor: "Santacruz" },
+      { dayIdx: 5, bloque: 1, curso: "4A", materia: "BD", aula: "LABO ED4 (4002)", profesor: "Kristal" },
+      { dayIdx: 5, bloque: 1, curso: "4B", materia: "MATEMATICA", aula: "1302", profesor: "Contreras" },
+      { dayIdx: 5, bloque: 1, curso: "4C", materia: "PROG", aula: "CEO", profesor: "Jolodovsky" },
+      { dayIdx: 5, bloque: 1, curso: "5A", materia: "PDP", aula: "CIDI IZQ", profesor: "Roitman" },
+      { dayIdx: 5, bloque: 1, curso: "5B", materia: "PDP", aula: "CIDI DER", profesor: "Turek / Snieg" },
+      { dayIdx: 5, bloque: 1, curso: "5C", materia: "DAI", aula: "LUM", profesor: "Rodriguez / Auday" },
+      { dayIdx: 5, bloque: 1, curso: "5D", materia: "DAI", aula: "AMI", profesor: "Abdo / Goldfeld" },
+      { dayIdx: 5, bloque: 1, curso: "5E", materia: "PDP", aula: "HMP", profesor: "Peña / Ulman" },
+      { dayIdx: 5, bloque: 1, curso: "ARTE", materia: "2E/2M", aula: "AULA", profesor: "Flaminio" },
+      // VIERNES - Bloque 2
+      { dayIdx: 5, bloque: 2, curso: "3A", materia: "H.JUDIA", aula: "1103", profesor: "Wolfus" },
+      { dayIdx: 5, bloque: 2, curso: "3B", materia: "ECONOMIA", aula: "1104", profesor: "Toimaher" },
+      { dayIdx: 5, bloque: 2, curso: "3C", materia: "LENGUA", aula: "1105", profesor: "Bochatay" },
+      { dayIdx: 5, bloque: 2, curso: "3D", materia: "FISICA", aula: "4210", profesor: "Galperin" },
+      { dayIdx: 5, bloque: 2, curso: "4A", materia: "H.JUDIA", aula: "1303", profesor: "Marchi" },
+      { dayIdx: 5, bloque: 2, curso: "4B", materia: "LENGUA", aula: "1302", profesor: "Szyszlican" },
+      { dayIdx: 5, bloque: 2, curso: "4C", materia: "FISICA", aula: "1301", profesor: "Samper" },
+      { dayIdx: 5, bloque: 2, curso: "5A", materia: "PDP", aula: "CIDI IZQ", profesor: "Roitman" },
+      { dayIdx: 5, bloque: 2, curso: "5B", materia: "PDP", aula: "CIDI DER", profesor: "Turek / Snieg" },
+      { dayIdx: 5, bloque: 2, curso: "5C", materia: "DAI", aula: "LUM", profesor: "Rodriguez / Auday" },
+      { dayIdx: 5, bloque: 2, curso: "5D", materia: "DAI", aula: "AMI", profesor: "Abdo / Goldfeld" },
+      { dayIdx: 5, bloque: 2, curso: "5E", materia: "PDP", aula: "HMP", profesor: "Peña / Ulman" },
+      // VIERNES - Bloque 3
+      { dayIdx: 5, bloque: 3, curso: "3A", materia: " HISTORIA ", aula: "1103", profesor: "Santacruz" },
+      { dayIdx: 5, bloque: 3, curso: "3B", materia: "H.JUDIA", aula: "1104", profesor: "Lichtenstein" },
+      { dayIdx: 5, bloque: 3, curso: "3C", materia: "FISICA", aula: "1105", profesor: "Melieni" },
+      { dayIdx: 5, bloque: 3, curso: "3D", materia: "IMAGEN", aula: "LUM", profesor: "Zapolski / Flaminio" },
+      { dayIdx: 5, bloque: 3, curso: "4A", materia: "MATEMATICA", aula: "1303", profesor: "Brizuela" },
+      { dayIdx: 5, bloque: 3, curso: "4B", materia: "FISICA", aula: "1302", profesor: "Samper" },
+      { dayIdx: 5, bloque: 3, curso: "4C", materia: "MATEMATICA", aula: "1301", profesor: "Contreras" },
+      { dayIdx: 5, bloque: 3, curso: "5A", materia: "DAI", aula: "AMI", profesor: "Peña / Goldfeld" },
+      { dayIdx: 5, bloque: 3, curso: "5B", materia: "DAI", aula: "CEO", profesor: "Rodriguez / Auday" },
+      { dayIdx: 5, bloque: 3, curso: "5C", materia: "PDP", aula: "CIDI IZQ", profesor: "Roitman" },
+      { dayIdx: 5, bloque: 3, curso: "5D", materia: "PDP", aula: "CIDI DER", profesor: "Turek" },
+      { dayIdx: 5, bloque: 3, curso: "5E", materia: "DAI", aula: "HMP", profesor: "Abdo / Ulman" },
+      // VIERNES - Bloque 4
+      { dayIdx: 5, bloque: 4, curso: "3A", materia: "INGLES", aula: "1103", profesor: "" },
+      { dayIdx: 5, bloque: 4, curso: "3B", materia: "INGLES", aula: "1104", profesor: "" },
+      { dayIdx: 5, bloque: 4, curso: "3C", materia: "INGLES", aula: "1105", profesor: "" },
+      { dayIdx: 5, bloque: 4, curso: "3D", materia: "INGLES", aula: "1106", profesor: "" },
+      { dayIdx: 5, bloque: 4, curso: "4B", materia: "EFSI", aula: "CEO", profesor: "Zapolski" },
+      { dayIdx: 5, bloque: 4, curso: "4C", materia: "BD", aula: "LUM", profesor: "Auday" },
+      { dayIdx: 5, bloque: 4, curso: "5A", materia: "LENGUA", aula: "1303", profesor: "Bochatay" },
+      { dayIdx: 5, bloque: 4, curso: "5B", materia: "LENGUA", aula: "1304", profesor: "Costa" },
+      { dayIdx: 5, bloque: 4, curso: "5C", materia: "H.JUDIA", aula: "1301", profesor: "Luna" },
+      { dayIdx: 5, bloque: 4, curso: "5D", materia: "LENGUA", aula: "1302", profesor: "Marti" },
+      // VIERNES - Bloque 5
+      { dayIdx: 5, bloque: 5, curso: "3B", materia: "GEOGRAFIA", aula: "1104", profesor: "Baigorria" },
+      { dayIdx: 5, bloque: 5, curso: "3C", materia: "ECONOMIA", aula: "1105", profesor: "Toimaher" },
+      { dayIdx: 5, bloque: 5, curso: "4B", materia: "EFSI", aula: "CEO", profesor: "Zapolski" },
+      { dayIdx: 5, bloque: 5, curso: "4C", materia: "BD", aula: "LUM", profesor: "Auday" },
+      { dayIdx: 5, bloque: 5, curso: "5A", materia: "FUENTES", aula: "1303", profesor: "Faur" },
+      { dayIdx: 5, bloque: 5, curso: "5B", materia: "QUIMICA", aula: "1304", profesor: "Otero" }
+    ];
+
+    var ENCARGADOS_MEDIODIA = {
+      1: "(12:15-12:40): Fede | (12:40-13:10): Marto y Delfi",
+      2: "(12:15-12:40): Delfi | (12:40-13:10): Jesi",
+      3: "(12:15-12:40): Johi y Fede | (12:40-13:10): Delfi",
+      4: "(12:15-12:40): Fede | (12:40-13:10): Jesi",
+      5: "(12:15-12:40): Delfi | (12:40-13:10): Johi"
+    };
+
+    var ASISTENTES = [
+      // JESI
+      { dayIdx: 2, bloque: 1, nombre: "JESI", enLabo: false, curso: "5C" },
+      { dayIdx: 2, bloque: 2, nombre: "JESI", enLabo: false, curso: "5C" },
+      { dayIdx: 2, bloque: 3, nombre: "JESI", enLabo: true, curso: "" },
+      { dayIdx: 2, bloque: 6, nombre: "JESI", enLabo: true, curso: "", consulta: true },
+      { dayIdx: 3, bloque: 2, nombre: "JESI", enLabo: false, curso: "5B" },
+      { dayIdx: 3, bloque: 3, nombre: "JESI", enLabo: true, curso: "" },
+      { dayIdx: 3, bloque: 5, nombre: "JESI", enLabo: true, curso: "" },
+      { dayIdx: 3, bloque: 6, nombre: "JESI", enLabo: true, curso: "" },
+      { dayIdx: 4, bloque: 1, nombre: "JESI", enLabo: false, curso: "5C" },
+      { dayIdx: 4, bloque: 2, nombre: "JESI", enLabo: false, curso: "5B" },
+      { dayIdx: 4, bloque: 3, nombre: "JESI", enLabo: true, curso: "" },
+      { dayIdx: 4, bloque: 4, nombre: "JESI", enLabo: true, curso: "" },
+      { dayIdx: 5, bloque: 4, nombre: "JESI", enLabo: true, curso: "", consulta: true },
+      { dayIdx: 5, bloque: 5, nombre: "JESI", enLabo: true, curso: "", consulta: true },
+      // JOHI
+      { dayIdx: 1, bloque: 2, nombre: "JOHI", enLabo: false, curso: "3B" },
+      { dayIdx: 1, bloque: 3, nombre: "JOHI", enLabo: false, curso: "3C" },
+      { dayIdx: 2, bloque: 1, nombre: "JOHI", enLabo: true, curso: "" },
+      { dayIdx: 2, bloque: 2, nombre: "JOHI", enLabo: true, curso: "" },
+      { dayIdx: 2, bloque: 3, nombre: "JOHI", enLabo: true, curso: "" },
+      { dayIdx: 2, bloque: 4, nombre: "JOHI", enLabo: false, curso: "3D" },
+      { dayIdx: 3, bloque: 1, nombre: "JOHI", enLabo: true, curso: "" },
+      { dayIdx: 3, bloque: 2, nombre: "JOHI", enLabo: false, curso: "3D" },
+      { dayIdx: 3, bloque: 3, nombre: "JOHI", enLabo: true, curso: "" },
+      { dayIdx: 4, bloque: 2, nombre: "JOHI", enLabo: true, curso: "" },
+      { dayIdx: 4, bloque: 3, nombre: "JOHI", enLabo: false, curso: "3A" },
+      { dayIdx: 4, bloque: 5, nombre: "JOHI", enLabo: false, curso: "" },
+      { dayIdx: 5, bloque: 3, nombre: "JOHI", enLabo: true, curso: ""},
+      { dayIdx: 5, bloque: 4, nombre: "JOHI", enLabo: true, curso: "", consulta: true },
+      { dayIdx: 5, bloque: 5, nombre: "JOHI", enLabo: true, curso: "", consulta: true },
+      // FEDE
+      { dayIdx: 1, bloque: 1, nombre: "FEDE", enLabo: true, curso: "" },
+      { dayIdx: 1, bloque: 2, nombre: "FEDE", enLabo: true, curso: "" },
+      { dayIdx: 1, bloque: 3, nombre: "FEDE", enLabo: true, curso: "" },
+      { dayIdx: 2, bloque: 4, nombre: "FEDE", enLabo: true, curso: "" },
+      { dayIdx: 2, bloque: 5, nombre: "FEDE", enLabo: false, curso: "3B" },
+      { dayIdx: 2, bloque: 6, nombre: "FEDE", enLabo: true, curso: "", consulta: true },
+      { dayIdx: 3, bloque: 1, nombre: "FEDE", enLabo: false, curso: "4C" },
+      { dayIdx: 3, bloque: 2, nombre: "FEDE", enLabo: false, curso: "3C" },
+      { dayIdx: 3, bloque: 3, nombre: "FEDE", enLabo: true, curso: "" },
+      { dayIdx: 3, bloque: 4, nombre: "FEDE", enLabo: false, curso: "4B" },
+      { dayIdx: 4, bloque: 1, nombre: "FEDE", enLabo: true, curso: "" },
+      { dayIdx: 4, bloque: 2, nombre: "FEDE", enLabo: false, curso: "5E" },
+      { dayIdx: 4, bloque: 3, nombre: "FEDE", enLabo: false, curso: "3C" },
+      { dayIdx: 4, bloque: 4, nombre: "FEDE", enLabo: true, curso: "" },
+      { dayIdx: 4, bloque: 5, nombre: "FEDE", enLabo: false, curso: "3B" },
+      { dayIdx: 4, bloque: 6, nombre: "FEDE", enLabo: true, curso: "" },
+      // DELFI
+      { dayIdx: 1, bloque: 4, nombre: "DELFI", enLabo: false, curso: "3D" },
+      { dayIdx: 1, bloque: 5, nombre: "DELFI", enLabo: false, curso: "3D" },
+      { dayIdx: 1, bloque: 6, nombre: "DELFI", enLabo: true, curso: "", consulta: true },
+      { dayIdx: 2, bloque: 1, nombre: "DELFI", enLabo: false, curso: "4B" },
+      { dayIdx: 2, bloque: 2, nombre: "DELFI", enLabo: false, curso: "3A" },
+      { dayIdx: 2, bloque: 3, nombre: "DELFI", enLabo: true, curso: "" },
+      { dayIdx: 3, bloque: 3, nombre: "DELFI", enLabo: true, curso: "" },
+      { dayIdx: 3, bloque: 4, nombre: "DELFI", enLabo: false, curso: "3A" },
+      { dayIdx: 3, bloque: 5, nombre: "DELFI", enLabo: false, curso: "3A" },
+      { dayIdx: 3, bloque: 6, nombre: "DELFI", enLabo: true, curso: "" },
+      { dayIdx: 4, bloque: 4, nombre: "DELFI", enLabo: false, curso: "3A" },
+      { dayIdx: 4, bloque: 5, nombre: "DELFI", enLabo: false, curso: "3A" },
+      { dayIdx: 4, bloque: 6, nombre: "DELFI", enLabo: true, curso: "", consulta: true },
+      { dayIdx: 5, bloque: 1, nombre: "DELFI", enLabo: true, curso: "" },
+      { dayIdx: 5, bloque: 2, nombre: "DELFI", enLabo: true, curso: "" },
+      { dayIdx: 5, bloque: 3, nombre: "DELFI", enLabo: true, curso: "" },
+      // MARTO
+      { dayIdx: 1, bloque: 1, nombre: "MARTO", enLabo: false, curso: "3A" },
+      { dayIdx: 1, bloque: 2, nombre: "MARTO", enLabo: true, curso: "" },
+      { dayIdx: 1, bloque: 3, nombre: "MARTO", enLabo: true, curso: "" },
+      { dayIdx: 1, bloque: 4, nombre: "MARTO", enLabo: false, curso: "3B"},
+      { dayIdx: 1, bloque: 5, nombre: "MARTO", enLabo: false, curso: "3B"},
+      { dayIdx: 1, bloque: 6, nombre: "MARTO", enLabo: true, curso: ""},
+      { dayIdx: 2, bloque: 4, nombre: "MARTO", enLabo: false, curso: "5A" },
+      { dayIdx: 2, bloque: 5, nombre: "MARTO", enLabo: false, curso: "3D" },
+      { dayIdx: 3, bloque: 1, nombre: "MARTO", enLabo: false, curso: "4B" },
+      { dayIdx: 3, bloque: 2, nombre: "MARTO", enLabo: false, curso: "3B" },
+      { dayIdx: 3, bloque: 3, nombre: "MARTO", enLabo: true, curso: "" },
+      { dayIdx: 4, bloque: 2, nombre: "MARTO", enLabo: false, curso: "3C" },
+      { dayIdx: 4, bloque: 3, nombre: "MARTO", enLabo: false, curso: "3D"},
+      { dayIdx: 5, bloque: 1, nombre: "MARTO", enLabo: true, curso: "" },
+      { dayIdx: 5, bloque: 2, nombre: "MARTO", enLabo: true, curso: "" },
+      { dayIdx: 5, bloque: 3, nombre: "MARTO", enLabo: true, curso: "" }
+      
+    ];
+
+    function pad2(n) { return n < 10 ? '0' + n : '' + n; }
+    function getArgentinaDate() { var now = new Date(); var utc = now.getTime() + (now.getTimezoneOffset() * 60000); return new Date(utc - 10800000); }
+    function toMinutes(hhmm) { var p = hhmm.split(':'); return parseInt(p[0], 10) * 60 + parseInt(p[1], 10); }
+    function getCurrentSlot() { var now = getArgentinaDate(); var m = now.getHours() * 60 + now.getMinutes(); for (var i = 0; i < BLOQUES.length; i++) { var b = BLOQUES[i]; if (m >= toMinutes(b.start) && m < toMinutes(b.end)) return b; } return null; }
+    function getNextBlock(cs) { if (!cs) return BLOCK_SLOTS[0] || null; var idx = -1; for (var i = 0; i < BLOQUES.length; i++) { if (BLOQUES[i] === cs) { idx = i; break; } } for (var j = idx + 1; j < BLOQUES.length; j++) { if (BLOQUES[j].type === 'block') return BLOQUES[j]; } return null; }
+    function getClasesHoy(d) { var r = []; for (var i = 0; i < CLASES.length; i++) { if (CLASES[i].dayIdx === d) r.push(CLASES[i]); } return r; }
+    function getClase(d, b, c) { for (var i = 0; i < CLASES.length; i++) { var x = CLASES[i]; if (x.dayIdx === d && x.bloque === b && x.curso === c) return x; } return null; }
+    function getArteClase(d, b) { return getClase(d, b, 'ARTE'); }
+    function getAsistentesEnLabo(d, b) { var r = []; for (var i = 0; i < ASISTENTES.length; i++) { var a = ASISTENTES[i]; if (a.dayIdx === d && a.bloque === b && a.enLabo) r.push(a); } return r; }
+    function getAsistenteDeCurso(d, b, c) { for (var i = 0; i < ASISTENTES.length; i++) { var a = ASISTENTES[i]; if (a.dayIdx === d && a.bloque === b && a.curso === c && !a.enLabo) return a; } return null; }
+    function esMateriaInfo(materia) {
+      var materias = [
+        'TI',
+        'TEI',
+        'PROG',
+        'EFSI',
+        'EFSI II',
+        'IMAGEN',
+        'BD',
+        'SEMINARIO',
+        'HISTORIA',
+        'ARTE',
+        'PDP',
+        'DAI',
+        'SSI'
+      ];
+
+      return materias.indexOf(materia) !== -1;
+    }
+    function esAulaInfo(aula) {
+      if (!aula) return false;
+
+      var aulas = [
+        'CIDI',
+        'CIDI IZQ',
+        'CIDI DER',
+        'HMP',
+        'LUM',
+        'CEO',
+        'AMI',
+        '4002'
+      ];
+
+      for (var i = 0; i < aulas.length; i++) {
+        if (aula.indexOf(aulas[i]) !== -1) {
+          return true;
+        }
+      }
+
+      return false;
+    }
+
+    function renderTable(dayIdx, currentSlot) {
+      var currentLabel = currentSlot ? currentSlot.label : null;
+      var currentStart = currentSlot ? currentSlot.start : null;
+      
+      var headHtml = '<tr><th>Bloque</th>';
+      for (var c = 0; c < CURSOS.length; c++) headHtml += '<th>' + CURSOS[c] + '</th>';
+      headHtml += '<th class="arte">Arte</th><th class="labo">Labo</th></tr>';
+      document.getElementById('table-head').innerHTML = headHtml;
+      
+      var bodyHtml = '';
+      
+      for (var b = 0; b < BLOQUES.length; b++) {
+        var blq = BLOQUES[b];
+        
+        if (blq.type === 'break') {
+          continue;
+        }
+        
+        var isCur = (currentLabel === blq.label && currentStart === blq.start);
+        
+        if (blq.type === 'lunch') {
+          // -----------------------------------------------------------------
+          // FILA DEL MEDIODÍA COMPACTA
+          // -----------------------------------------------------------------
+          var encargadoHoy = ENCARGADOS_MEDIODIA[dayIdx] || "Sin asignar";
+          
+          bodyHtml += '<tr' + (isCur ? ' class="current"' : '') + '>';
+          // Forzamos un padding mínimo de 0.1em vertical para aplastarla
+          bodyHtml += '<td style="padding: 0.1em 0.1em; vertical-align: middle;">';
+          bodyHtml += '  <span class="bloque-num" style="font-size: 0.85em; margin: 0;">-</span>';
+          bodyHtml += '  <span class="bloque-time" style="font-size: 0.65em; display: block;">' + blq.start + '</span>';
+          bodyHtml += '</td>';
+          
+          // Aplicamos el mismo padding mínimo a la celda del encargado
+          bodyHtml += '<td colspan="14" style="vertical-align: middle; background-color: #f8fafc; padding: 0.1em; text-align: center; font-size: 1.1vh; color: #475569;">';
+          bodyHtml += '  <strong>CUBRE:</strong> <span class="asistente" style="font-size: 1.5vh; padding: 0.1em 0.6em; margin: 0; display: inline-block;">' + encargadoHoy + '</span>';
+          bodyHtml += '</td>';
+          bodyHtml += '</tr>';
+          
+        } else {
+          // -----------------------------------------------------------------
+          // FILAS DE MATERIAS NORMALES (Tu diseño original sin cambios)
+          // -----------------------------------------------------------------
+          bodyHtml += '<tr' + (isCur ? ' class="current"' : '') + '>';
+          bodyHtml += '<td><span class="bloque-num">' + blq.n + '</span><br><span class="bloque-time">' + blq.start + '</span></td>';
+          
+          for (var c = 0; c < CURSOS.length; c++) {
+            var clase = getClase(dayIdx, blq.n, CURSOS[c]);
+            var asist = clase ? getAsistenteDeCurso(dayIdx, blq.n, CURSOS[c]) : null;
+            bodyHtml += '<td>';
+            if (clase && clase.materia) {
+              bodyHtml += '<span class="materia' + (esMateriaInfo(clase.materia) ? ' materia-info' : '') + '">' + clase.materia + '</span>';
+              if (clase.aula) bodyHtml += '<span class="aula' + (esAulaInfo(clase.aula) ? ' aula-labo' : '') + '">' + clase.aula + '</span>';
+              if (clase.profesor) bodyHtml += '<span class="profesor">' + clase.profesor + '</span>';
+              if (asist) bodyHtml += '<span class="asistente">' + asist.nombre + '</span>';
+            } else { bodyHtml += '<span class="empty">-</span>'; }
+            bodyHtml += '</td>';
+          }
+          
+          var arte = getArteClase(dayIdx, blq.n);
+          bodyHtml += '<td class="arte-col">';
+          if (arte && arte.materia) {
+            bodyHtml += '<span class="materia' + (esMateriaInfo(arte.materia) ? ' materia-info' : '') + '">' + arte.materia + '</span>';
+            if (arte.aula) bodyHtml += '<span class="aula' + (esAulaInfo(arte.aula) ? ' aula-labo' : '') + '">' + arte.aula + '</span>';
+            if (arte.profesor) bodyHtml += '<span class="profesor">' + arte.profesor + '</span>';
+          } else { bodyHtml += '<span class="empty">-</span>'; }
+          bodyHtml += '</td>';
+          
+          var enLabo = getAsistentesEnLabo(dayIdx, blq.n);
+          bodyHtml += '<td class="labo-col">';
+          if (enLabo.length > 0) {
+            for (var a = 0; a < enLabo.length; a++) {
+              bodyHtml += '<span class="labo-asist">' + enLabo[a].nombre + '<small>' + (enLabo[a].consulta ? 'Consulta' : 'En lab') + '</small></span> ';
+            }
+          } else { bodyHtml += '<span class="empty">-</span>'; }
+          bodyHtml += '</td></tr>';
+        }
+      }
+      
+      document.getElementById('table-body').innerHTML = bodyHtml;
+    }
+
+    function renderCursoView(currentSlot, curso) {
+      document.getElementById('curso-title').innerHTML = 'Horario Semanal de ' + curso;
+      var realDayIdx = getArgentinaDate().getDay();
+      var curBn = currentSlot ? currentSlot.n : null;
+
+      // Header with days
+      var headHtml = '<tr><th>Bloque</th>';
+      for (var d = 1; d <= 5; d++) {
+        var isToday = (d === realDayIdx);
+        headHtml += '<th' + (isToday ? ' class="today"' : '') + '>' + DIAS_ES[d] + '</th>';
+      }
+      headHtml += '</tr>';
+      document.getElementById('curso-week-head').innerHTML = headHtml;
+
+      // Body with blocks
+      var bodyHtml = '';
+      for (var b = 0; b < BLOCK_SLOTS.length; b++) {
+        var blq = BLOCK_SLOTS[b];
+        var isCurRow = (curBn === blq.n);
+        bodyHtml += '<tr' + (isCurRow ? ' class="current-row"' : '') + '>';
+        bodyHtml += '<td><div class="bloque-num">' + blq.n + '</div><div class="bloque-time">' + blq.start + '</div></td>';
+
+        for (var d = 1; d <= 5; d++) {
+          var isToday = (d === realDayIdx);
+          var clase = getClase(d, blq.n, curso);
+          var asist = clase ? getAsistenteDeCurso(d, blq.n, curso) : null;
+          bodyHtml += '<td class="' + (isToday ? 'today-col' : '') + '">';
+          if (clase && clase.materia) {
+            bodyHtml += '<span class="materia' + (esMateriaInfo(clase.materia) ? ' materia-info' : '') + '">' + clase.materia + '</span>';
+            if (clase.aula) bodyHtml += '<span class="aula' + (esAulaInfo(clase.aula) ? ' aula-labo' : '') + '">' + clase.aula + '</span>';
+            if (clase.profesor) bodyHtml += '<span class="profesor">' + clase.profesor + '</span>';
+            if (asist) bodyHtml += '<span class="asistente">' + asist.nombre + '</span>';
+          } else {
+            bodyHtml += '<span class="empty">-</span>';
+          }
+          bodyHtml += '</td>';
+        }
+        bodyHtml += '</tr>';
+      }
+      document.getElementById('curso-week-body').innerHTML = bodyHtml;
+    }
+
+
+    function renderBottomBar(currentSlot) {
+      var el = document.getElementById('bottom-bar');
+      if (!el) return;  // ← si no existe, sale sin error
+      var nextSlot = getNextBlock(currentSlot);
+      var html = '';
+      for (var i = 0; i < BLOCK_SLOTS.length; i++) {
+        var b = BLOCK_SLOTS[i];
+        var cls = 'block-chip';
+        if (currentSlot && b.n === currentSlot.n) cls += ' current';
+        html += '<div class="' + cls + '"><strong>' + b.label + '</strong><span>' + b.start + '</span></div>';
+      }
+      el.innerHTML = html;
+    }
+
+    function renderSpace() {
+      var el = document.getElementById('space-text');
+      if (!el) return;
+
+      setTimeout(function() {
+        el.textContent = '';
+      }, 500); // visible 0,5 segundos
+    }
+
+    function onDayChange() { selectedDay = document.getElementById('day-select').value; updateBtnToday(); update(); }
+    function onCursoChange() { selectedCurso = document.getElementById('curso-select').value; update(); }
+    function resetToToday() { selectedDay = 'auto'; selectedCurso = 'all'; document.getElementById('day-select').value = 'auto'; document.getElementById('curso-select').value = 'all'; updateBtnToday(); update(); }
+    function updateBtnToday() { document.getElementById('btn-today').disabled = (selectedDay === 'auto' && selectedCurso === 'all'); }
+    function getDisplayDayIdx() { if (selectedDay === 'auto') return getArgentinaDate().getDay(); return parseInt(selectedDay, 10); }
+
+    function update() {
+      var now = getArgentinaDate();
+      var realDayIdx = now.getDay();
+      var dayIdx = getDisplayDayIdx();
+      var currentSlot = (selectedDay === 'auto') ? getCurrentSlot() : null;
+      var nextSlot = getNextBlock(currentSlot);
+      document.getElementById('clock-time').innerHTML = pad2(now.getHours()) + ':' + pad2(now.getMinutes()) + ':' + pad2(now.getSeconds());
+      document.getElementById('clock-date').innerHTML = DIAS_ES[realDayIdx] + ' ' + pad2(now.getDate()) + '/' + pad2(now.getMonth() + 1) + '/' + now.getFullYear();
+      document.getElementById('day-badge').innerHTML = DIAS_ES[dayIdx];
+      var dot = document.getElementById('status-dot');
+      var label = document.getElementById('status-label');
+      var time = document.getElementById('status-time');
+      if (currentSlot) {
+        label.innerHTML = currentSlot.label;
+        time.innerHTML = currentSlot.start + ' - ' + currentSlot.end;
+        dot.className = currentSlot.type === 'break' ? 'status-dot break pulse' : 'status-dot pulse';
+      } else {
+        label.innerHTML = selectedDay === 'auto' ? 'Fuera de horario' : 'Viendo ' + DIAS_ES[dayIdx];
+        time.innerHTML = '';
+        dot.className = 'status-dot inactive';
+      }
+      var isWeekend = (dayIdx === 0 || dayIdx === 6);
+      if (isWeekend) {
+        document.getElementById('weekend-msg').style.display = 'block';
+        document.getElementById('schedule-table').style.display = 'none';
+        document.getElementById('curso-view').style.display = 'none';
+        document.getElementById('divider-info').style.display = 'none';
+        document.getElementById('status-info').innerHTML = '';
+        document.getElementById('divider-next').style.display = 'none';
+        document.getElementById('status-next').innerHTML = '';
+      } else {
+        document.getElementById('weekend-msg').style.display = 'none';
+        if (selectedCurso !== 'all') {
+          document.getElementById('schedule-table').style.display = 'none';
+          document.getElementById('curso-view').style.display = 'block';
+          renderCursoView(currentSlot, selectedCurso);
+        } else {
+          document.getElementById('schedule-table').style.display = 'table';
+          document.getElementById('curso-view').style.display = 'none';
+          renderTable(dayIdx, currentSlot);
+        }
+        var clasesHoy = getClasesHoy(dayIdx);
+        var curBn = currentSlot ? currentSlot.n : null;
+        if (curBn) {
+          var pCount = 0;
+          for (var i = 0; i < clasesHoy.length; i++) { if (clasesHoy[i].bloque === curBn && clasesHoy[i].curso !== 'ARTE') pCount++; }
+          var asistHoy = getAsistentesEnLabo(dayIdx, curBn);
+          document.getElementById('divider-info').style.display = 'block';
+          document.getElementById('status-info').innerHTML = '<strong>' + pCount + '</strong> clases &middot; <strong>' + asistHoy.length + '</strong> asist. en labo';
+        } else {
+          document.getElementById('divider-info').style.display = 'none';
+          document.getElementById('status-info').innerHTML = '';
+        }
+        if (nextSlot && currentSlot) {
+          document.getElementById('divider-next').style.display = 'block';
+          document.getElementById('status-next').innerHTML = 'Proximo: <strong>' + nextSlot.label + '</strong> &middot; ' + nextSlot.start;
+        } else {
+          document.getElementById('divider-next').style.display = 'none';
+          document.getElementById('status-next').innerHTML = '';
+        }
+      }
+      setInterval(function() {
+        renderSpace();
+      }, 3 * 60 * 1000);
+
+      renderBottomBar(currentSlot);
+    }
+
+    updateBtnToday();
+    update();
+    setInterval(update, 1000);
+  </script>
+</body>
+
+</html>
