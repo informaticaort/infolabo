@@ -183,11 +183,6 @@
       margin-right: 0.5em;
     }
 
-    .filter-group {
-      display: flex;
-      align-items: center;
-    }
-
     .filter-label {
       font-size: 0.9375em;
       font-weight: 600;
@@ -579,7 +574,151 @@
     .pulse {
       animation: pulse 2s infinite;
     }
-  </style>
+
+    /* Contenedor que habilita el scroll horizontal fluido en tablas */
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      border-radius: 0.625em;
+      box-shadow: 0 1px 0.25em rgba(0, 0, 0, 0.06);
+      background: white;
+    }
+
+    /* Ancho mínimo para mantener legible la tabla sin comprimir celdas */
+    .schedule-table {
+      min-width: 900px;
+    }
+
+    .curso-week-table {
+      min-width: 600px;
+    }
+
+    /* ==========================================================================
+       ADAPTACIÓN RESPONSIVE AJUSTADA (Móviles y Tablets)
+       ========================================================================== */
+    @media (max-width: 768px) {
+      /* Top bar */
+      .top-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5em;
+        padding: 0.8em;
+      }
+
+      .title {
+        font-size: 1.1em;
+      }
+
+      .clock {
+        text-align: left;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+        padding-top: 0.4em;
+      }
+
+      .clock-time {
+        font-size: 1.25em;
+      }
+
+      .clock-date {
+        font-size: 0.75em;
+      }
+
+      /* Status Bar */
+      .status-bar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.6em;
+        padding: 0.6em 0.8em;
+        margin: 0.4em 0.8em;
+        font-size: 0.8em;
+      }
+
+      .status-bar > * {
+        margin-right: 0;
+      }
+
+      /* Ocultar divisores verticales en móviles */
+      .divider {
+        display: none !important;
+      }
+
+      /* Filtros */
+      .filters {
+        margin-left: 0;
+        flex-direction: column;
+        width: 100%;
+        gap: 0.4em;
+      }
+
+      .filter-group {
+        width: 100%;
+        justify-content: space-between;
+        font-size: 0.8em;
+      }
+
+      .filter-select {
+        flex-grow: 1;
+        min-width: unset;
+        font-size: 0.85em;
+        padding: 0.3em 0.5em;
+      }
+
+      .btn-today {
+        width: 100%;
+        padding: 0.5em;
+        font-size: 0.8em;
+      }
+
+      .main {
+        padding: 0 0.6em 5em;
+      }
+
+      /* Ajustes reducidos a las celdas de las tablas */
+      .schedule-table,
+      .curso-week-table {
+        font-size: 10.5px;
+      }
+
+      .schedule-table th,
+      .curso-week-table th {
+        font-size: 10px;
+        padding: 6px 4px;
+      }
+
+      .materia {
+        font-size: 10px;
+        font-weight: 600;
+      }
+
+      .profesor {
+        font-size: 9px;
+      }
+
+      .aula, .asistente {
+        font-size: 8.5px;
+      }
+
+      /* Bottom bar deslizable */
+      .bottom-bar {
+        overflow-x: auto;
+        justify-content: flex-start;
+        padding: 0.4em 0.6em;
+        -webkit-overflow-scrolling: touch;
+        gap: 0.3em;
+      }
+
+      .block-chip {
+        flex-shrink: 0;
+        font-size: 0.72em;
+        padding: 0.35em 0.6em;
+      }
+    }
+</style>
 </head>
 
 <body>
@@ -652,16 +791,21 @@
       <h2>Fin de semana</h2>
       <p>No hay clases programadas</p>
     </div>
-    <table class="schedule-table" id="schedule-table">
-      <thead id="table-head"></thead>
-      <tbody id="table-body"></tbody>
-    </table>
+    <!-- Contenedor con scroll para móviles -->
+    <div class="table-container">
+      <table class="schedule-table" id="schedule-table">
+        <thead id="table-head"></thead>
+        <tbody id="table-body"></tbody>
+      </table>
+    </div>
     <div class="curso-view" id="curso-view" style="display:none;">
       <h2 class="curso-title" id="curso-title"></h2>
-      <table class="curso-week-table" id="curso-week-table">
-        <thead id="curso-week-head"></thead>
-        <tbody id="curso-week-body"></tbody>
-      </table>
+      <div class="table-container">
+        <table class="curso-week-table" id="curso-week-table">
+          <thead id="curso-week-head"></thead>
+          <tbody id="curso-week-body"></tbody>
+        </table>
+      </div>
     </div>
   </div>
 
@@ -907,8 +1051,8 @@
       { dayIdx: 4, bloque: 1, curso: "3C", materia: "H.JUDIA", aula: "1105", profesor: "Lichtenstein" },
       { dayIdx: 4, bloque: 1, curso: "3D", materia: "FISICA", aula: "1106", profesor: "Galperin" },
       { dayIdx: 4, bloque: 1, curso: "4A", materia: "PROG", aula: "AMI", profesor: "Binker" },
-      { dayIdx: 4, bloque: 1, curso: "4B", materia: "PROG", aula: "LUM", profesor: "Kristal" },
-      { dayIdx: 4, bloque: 1, curso: "4C", materia: "PROG", aula: "CEO", profesor: "Jolodovsky" },
+      { dayIdx: 4, bloque: 1, curso: "4B", materia: "PROG", aula: "CEO", profesor: "Kristal" },
+      { dayIdx: 4, bloque: 1, curso: "4C", materia: "PROG", aula: "LUM", profesor: "Jolodovsky" },
       { dayIdx: 4, bloque: 1, curso: "5A", materia: "HISTORIA", aula: "1301", profesor: "Stancanelli" },
       { dayIdx: 4, bloque: 1, curso: "5B", materia: "FUENTES", aula: "1304", profesor: "Dabas" },
       { dayIdx: 4, bloque: 1, curso: "5C", materia: "Matematica", aula: "1101", profesor: "Romano" },
@@ -918,7 +1062,7 @@
       // JUEVES - Bloque 2
       { dayIdx: 4, bloque: 2, curso: "3A", materia: "MATEMATICA", aula: "1103", profesor: "Liberto" },
       { dayIdx: 4, bloque: 2, curso: "3B", materia: "BIOLOGIA", aula: "1104", profesor: "Rapalini" },
-      { dayIdx: 4, bloque: 2, curso: "3C", materia: "PROG", aula: "CEO", profesor: "Kristal" },
+      { dayIdx: 4, bloque: 2, curso: "3C", materia: "PROG", aula: "LUM", profesor: "Kristal" },
       { dayIdx: 4, bloque: 2, curso: "3D", materia: "ETICA", aula: "1106", profesor: "Arcuschin" },
       { dayIdx: 4, bloque: 2, curso: "4A", materia: "LENGUA", aula: "1303", profesor: "Landini" },
       { dayIdx: 4, bloque: 2, curso: "4B", materia: "MATEMATICA", aula: "1302", profesor: "Contreras" },
@@ -928,11 +1072,11 @@
       { dayIdx: 4, bloque: 2, curso: "5C", materia: "ED.FISICA", aula: "Gimnasio", profesor: "Charnis" },
       { dayIdx: 4, bloque: 2, curso: "5D", materia: "H.JUDIA", aula: "1105", profesor: "Faerverger" },
       { dayIdx: 4, bloque: 2, curso: "5E", materia: "HISTORIA", aula: "HMP / CIDI DER", profesor: "Stancanelli" },
-      { dayIdx: 4, bloque: 2, curso: "ARTE", materia: "2L/2N", aula: "LUM", profesor: "Dejtiar" },
+      { dayIdx: 4, bloque: 2, curso: "ARTE", materia: "2L/2N", aula: "CEO", profesor: "Dejtiar" },
       // JUEVES - Bloque 3
       { dayIdx: 4, bloque: 3, curso: "3A", materia: "SSI", aula: "1103", profesor: "Asman" },
       { dayIdx: 4, bloque: 3, curso: "3B", materia: "IMAGEN", aula: "AMI", profesor: "Rosales / Dejtiar" },
-      { dayIdx: 4, bloque: 3, curso: "3C", materia: "PROG", aula: "CEO", profesor: "Kristal" },
+      { dayIdx: 4, bloque: 3, curso: "3C", materia: "PROG", aula: "LUM", profesor: "Kristal" },
       { dayIdx: 4, bloque: 3, curso: "3D", materia: "TI", aula: "1106", profesor: "Ceriana" },
       { dayIdx: 4, bloque: 3, curso: "4A", materia: "ETICA", aula: "1303", profesor: "Levy" },
       { dayIdx: 4, bloque: 3, curso: "4B", materia: "H.JUDIA", aula: "1302", profesor: "Marchi" },
@@ -942,14 +1086,14 @@
       { dayIdx: 4, bloque: 3, curso: "5C", materia: "HISTORIA", aula: "HMP / CIDI DER", profesor: "Stancanelli" },
       { dayIdx: 4, bloque: 3, curso: "5D", materia: "QUIMICA", aula: "1105", profesor: "Macri" },
       { dayIdx: 4, bloque: 3, curso: "5E", materia: "LENGUA", aula: "1104", profesor: "Rugilo" },
-      { dayIdx: 4, bloque: 3, curso: "ARTE", materia: "2D/2H", aula: "LUM", profesor: "Flaminio" },
+      { dayIdx: 4, bloque: 3, curso: "ARTE", materia: "2D/2H", aula: "CEO", profesor: "Flaminio" },
       // JUEVES - Bloque 4
-      { dayIdx: 4, bloque: 4, curso: "3A", materia: "PROG", aula: "AMI", profesor: "Stancanelli" },
+      { dayIdx: 4, bloque: 4, curso: "3A", materia: "PROG", aula: "CEO", profesor: "Stancanelli" },
       { dayIdx: 4, bloque: 4, curso: "3B", materia: "FISICA", aula: "1104", profesor: "Failache" },
       { dayIdx: 4, bloque: 4, curso: "3C", materia: "SSI", aula: "1105", profesor: "Olivera" },
       { dayIdx: 4, bloque: 4, curso: "3D", materia: "LENGUA", aula: "1106", profesor: "Galperin" },
       { dayIdx: 4, bloque: 4, curso: "4A", materia: "FISICA", aula: "1303", profesor: "Riccardi" },
-      { dayIdx: 4, bloque: 4, curso: "4B", materia: "TI", aula: "CEO", profesor: "Ceriana" },
+      { dayIdx: 4, bloque: 4, curso: "4B", materia: "TI", aula: "AMI", profesor: "Ceriana" },
       { dayIdx: 4, bloque: 4, curso: "4C", materia: "EFSI", aula: "LUM", profesor: "Robbiano" },
       { dayIdx: 4, bloque: 4, curso: "5A", materia: "FILOSOFIA", aula: "1302", profesor: "Cohen" },
       { dayIdx: 4, bloque: 4, curso: "5B", materia: "QUIMICA", aula: "1304", profesor: "Otero" },
@@ -957,11 +1101,11 @@
       { dayIdx: 4, bloque: 4, curso: "5D", materia: "ED.FISICA", aula: "Gimnasio", profesor: "Cella" },
       { dayIdx: 4, bloque: 4, curso: "5E", materia: "QUIMICA", aula: "1103", profesor: "Stark" },
       // JUEVES - Bloque 5
-      { dayIdx: 4, bloque: 5, curso: "3A", materia: "PROG", aula: "AMI", profesor: "Stancanelli" },
+      { dayIdx: 4, bloque: 5, curso: "3A", materia: "PROG", aula: "CEO", profesor: "Stancanelli" },
       { dayIdx: 4, bloque: 5, curso: "3B", materia: "PROG", aula: "HMP / CIDI IZQ", profesor: "Olivera" },
       { dayIdx: 4, bloque: 5, curso: "3C", materia: "FISICA", aula: "4210", profesor: "Melieni" },
       { dayIdx: 4, bloque: 5, curso: "3D", materia: "MATEMATICA", aula: "1106", profesor: "Insfran" },
-      { dayIdx: 4, bloque: 5, curso: "4A", materia: "TI", aula: "CEO", profesor: "Ceriana" },
+      { dayIdx: 4, bloque: 5, curso: "4A", materia: "TI", aula: "AMI", profesor: "Ceriana" },
       { dayIdx: 4, bloque: 5, curso: "4C", materia: "EFSI", aula: "LUM", profesor: "Robbiano" },
       { dayIdx: 4, bloque: 5, curso: "5C", materia: "FILOSOFIA", aula: "1301", profesor: "Cohen" },
       { dayIdx: 4, bloque: 5, curso: "5D", materia: "LENGUA", aula: "1103", profesor: "Marti" },
@@ -971,7 +1115,7 @@
       { dayIdx: 4, bloque: 6, curso: "3B", materia: "INGLES", aula: "1104", profesor: "" },
       { dayIdx: 4, bloque: 6, curso: "3C", materia: "INGLES", aula: "1105", profesor: "" },
       { dayIdx: 4, bloque: 6, curso: "3D", materia: "INGLES", aula: "1106", profesor: "" },
-      { dayIdx: 4, bloque: 6, curso: "4A", materia: "ARTE", aula: "CEO", profesor: "Ceriana" },
+      { dayIdx: 4, bloque: 6, curso: "4A", materia: "ARTE", aula: "AMI", profesor: "Ceriana" },
       { dayIdx: 4, bloque: 6, curso: "4C", materia: "LENGUA", aula: "1301", profesor: "Hughes Rojas" },
       { dayIdx: 4, bloque: 6, curso: "5C", materia: "QUIMICA", aula: "1302", profesor: "Macri" },
       // VIERNES - Bloque 1
@@ -1042,6 +1186,22 @@
       5: "(12:15-12:40): Delfi | (12:40-13:10): Johi"
     };
 
+    // Array para definir qué asistente está en la materia Arte en determinado día y bloque
+    var ASISTENTES_ARTE = [
+      { dayIdx: 1, bloque: 3, nombre: "JOHI" }
+    ];
+
+// Función para obtener el asistente correspondiente
+function getAsistenteDeArte(dayIdx, bloqueNum) {
+  for (var i = 0; i < ASISTENTES_ARTE.length; i++) {
+    var a = ASISTENTES_ARTE[i];
+    if (a.dayIdx === dayIdx && a.bloque === bloqueNum) {
+      return a;
+    }
+  }
+  return null;
+}
+
     var ASISTENTES = [
       // JESI
       { dayIdx: 2, bloque: 1, nombre: "JESI", enLabo: true, curso: "" },
@@ -1060,7 +1220,7 @@
       { dayIdx: 5, bloque: 5, nombre: "JESI", enLabo: true, curso: "", consulta: true },
       // JOHI
       { dayIdx: 1, bloque: 2, nombre: "JOHI", enLabo: false, curso: "3B" },
-      { dayIdx: 1, bloque: 3, nombre: "JOHI", enLabo: true, curso: "" },
+      { dayIdx: 1, bloque: 3, nombre: "JOHI", enLabo: false, curso: "" },
       { dayIdx: 2, bloque: 1, nombre: "JOHI", enLabo: false, curso: "4A" },
       { dayIdx: 2, bloque: 2, nombre: "JOHI", enLabo: true, curso: "" },
       { dayIdx: 2, bloque: 3, nombre: "JOHI", enLabo: true, curso: "" },
@@ -1210,13 +1370,10 @@
           var encargadoHoy = ENCARGADOS_MEDIODIA[dayIdx] || "Sin asignar";
           
           bodyHtml += '<tr' + (isCur ? ' class="current"' : '') + '>';
-          // Forzamos un padding mínimo de 0.1em vertical para aplastarla
           bodyHtml += '<td style="padding: 0.1em 0.1em; vertical-align: middle;">';
-          bodyHtml += '  <span class="bloque-num" style="font-size: 0.85em; margin: 0;">-</span>';
+          bodyHtml += '  <span class="bloque-num" style="font-size: 0.85em; margin: 0;">Almuerzo</span>';
           bodyHtml += '  <span class="bloque-time" style="font-size: 0.65em; display: block;">' + blq.start + '</span>';
           bodyHtml += '</td>';
-          
-          // Aplicamos el mismo padding mínimo a la celda del encargado
           bodyHtml += '<td colspan="14" style="vertical-align: middle; background-color: #f8fafc; padding: 0.1em; text-align: center; font-size: 1.1vh; color: #475569;">';
           bodyHtml += '  <strong>CUBRE:</strong> <span class="asistente" style="font-size: 1.5vh; padding: 0.1em 0.6em; margin: 0; display: inline-block;">' + encargadoHoy + '</span>';
           bodyHtml += '</td>';
@@ -1224,11 +1381,12 @@
           
         } else {
           // -----------------------------------------------------------------
-          // FILAS DE MATERIAS NORMALES (Tu diseño original sin cambios)
+          // FILAS DE MATERIAS NORMALES
           // -----------------------------------------------------------------
           bodyHtml += '<tr' + (isCur ? ' class="current"' : '') + '>';
           bodyHtml += '<td><span class="bloque-num">' + blq.n + '</span><br><span class="bloque-time">' + blq.start + '</span></td>';
           
+          // Cursos estándar
           for (var c = 0; c < CURSOS.length; c++) {
             var clase = getClase(dayIdx, blq.n, CURSOS[c]);
             var asist = clase ? getAsistenteDeCurso(dayIdx, blq.n, CURSOS[c]) : null;
@@ -1242,15 +1400,22 @@
             bodyHtml += '</td>';
           }
           
+          // -----------------------------------------------------------------
+          // COLUMNA DE ARTE (CON ASISTENTE)
+          // -----------------------------------------------------------------
           var arte = getArteClase(dayIdx, blq.n);
+          var asistArte = getAsistenteDeArte(dayIdx, blq.n); // <--- Búsqueda del asistente de Arte
+          
           bodyHtml += '<td class="arte-col">';
           if (arte && arte.materia) {
             bodyHtml += '<span class="materia' + (esMateriaInfo(arte.materia) ? ' materia-info' : '') + '">' + arte.materia + '</span>';
             if (arte.aula) bodyHtml += '<span class="aula' + (esAulaInfo(arte.aula) ? ' aula-labo' : '') + '">' + arte.aula + '</span>';
             if (arte.profesor) bodyHtml += '<span class="profesor">' + arte.profesor + '</span>';
+            if (asistArte) bodyHtml += '<span class="asistente">' + asistArte.nombre + '</span>'; // <--- Render del asistente
           } else { bodyHtml += '<span class="empty">-</span>'; }
           bodyHtml += '</td>';
           
+          // Columna de Labo
           var enLabo = getAsistentesEnLabo(dayIdx, blq.n);
           bodyHtml += '<td class="labo-col">';
           if (enLabo.length > 0) {
